@@ -7,7 +7,7 @@ double DifferentEquParams::f(double x, double y, double z)
 
 double DifferentEquParams::u1(double x, double y, double z)
 {
-	return z;
+	return x;
 }
 
 double DifferentEquParams::du_dn(double x, double y, double z)

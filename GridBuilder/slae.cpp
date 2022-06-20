@@ -74,9 +74,7 @@ namespace slae
 		for (i_ind = ind_beg; i_ind < ind_end; i_ind++)
 		{
 			b_ind = jg[i_ind];
-
 			b[b_ind] -= gg[i_ind] * varMean;
-
 			gg[i_ind] = 0;
 		}
 
@@ -89,7 +87,6 @@ namespace slae
 			{
 				if (jg[i_ind] == ind_current)
 				{
-
 					b[iVar] -= gg[i_ind] * varMean;
 					gg[i_ind] = 0;
 				}

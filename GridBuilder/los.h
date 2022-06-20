@@ -26,7 +26,7 @@ protected:
 class LOS_precond : public LOS
 {
 public:
-	DecompSparseMatrixLDLt<SparseMatrixSym> LLt;
+	DecompSparseMatrixLDLt LLt;
 	int solve(SparseMatrixSym& A, double* b, double* x, int maxiter, double eps);
 private:
 	double* buf_v1;

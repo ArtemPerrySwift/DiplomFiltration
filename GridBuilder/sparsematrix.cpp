@@ -434,7 +434,7 @@ namespace matrix
 	}
 	*/
 
-	void DecompSparseMatrixLDLt<SparseMatrixSym>::decompMatrix(SparseMatrixSym& M)
+	void DecompSparseMatrixLDLt::decompMatrix(SparseMatrixSym& M)
 	{
 		copy(M);
 		std::cout << "Разложение Холесского для матрицы начато" << std::endl;
@@ -470,8 +470,8 @@ namespace matrix
 					//
 					//for (c = ig[i]; c < ig[i + 1] && jg[c] < k; c++);
 					//for (d = ig[j]; d < ig[j + 1] && jg[d] < k; d++);
-					if (jg[ik] == k && jg[kj] == j)
-						sumij += gg[ik] *di[k]* gg[kj];
+					if (jg[ik] == k && jg[jk] == k)
+						sumij += gg[ik] *di[k]* gg[jk];
 
 					//if (jg[jk] == k && jg[ki] == i)
 					//	sumji += gg[jk] * gg[ki];
@@ -498,7 +498,13 @@ namespace matrix
 		}
 	}
 
-	void DecompSparseMatrixLDLt<SparseMatrixSym>::solveLy(double* f, double* y)
+	void DecompSparseMatrixLDLt::solveDz(double* f, double* z)
+	{
+		for (int i = 0; i < n; i++)
+			z[i] = f[i] / di[i];
+	}
+
+	void DecompSparseMatrixLDLt::solveLy(double* f, double* y)
 	{
 		int i, j;
 		int i_beg, i_end;
@@ -517,7 +523,7 @@ namespace matrix
 		solveDz(y, y);
 	}
 
-	void DecompSparseMatrixLDLt<SparseMatrixSym>::solveUx(double* y, double* x)
+	void DecompSparseMatrixLDLt::solveUx(double* y, double* x)
 	{
 		int i, j;
 		int i_beg, i_end;
@@ -535,12 +541,6 @@ namespace matrix
 				x[j] -= gg[ij] * x[i];
 			}
 		}
-	}
-
-	void DecompSparseMatrixLDLt<SparseMatrixSym>::solveDz(double* f, double* z)
-	{
-		for (int i = 0; i < n; i++)
-			z[i] = f[i] / di[i];
 	}
 }
 

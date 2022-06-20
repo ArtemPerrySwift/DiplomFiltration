@@ -9,7 +9,7 @@ using namespace slae;
 class GlobalMatAssembler
 {
 public:
-	void assembleGlobalMatrix(SLAE& A, CalculationArea& mesh, double* q);
+	void assembleGlobalMatrix(SLAE<SparseMatrixSym>& A, CalculationArea& mesh, double* q);
 
 protected:
 	static const int N_KNOTS_1D = FinalElemBase::N_KNOTS_1D;
@@ -18,7 +18,7 @@ protected:
 
 	double localG[N_KNOTS_3D][N_KNOTS_3D], localM[N_KNOTS_3D][N_KNOTS_3D], localB[N_KNOTS_3D];
 
-	void addLocalToGlobalAll(SLAE& slae, double G_local[N_KNOTS_3D][N_KNOTS_3D], double M_local[N_KNOTS_3D][N_KNOTS_3D], double localB[N_KNOTS_3D], int L[N_KNOTS_3D]);
+	void addLocalToGlobalAll(SLAE<SparseMatrixSym>& slae, double G_local[N_KNOTS_3D][N_KNOTS_3D], double M_local[N_KNOTS_3D][N_KNOTS_3D], double localB[N_KNOTS_3D], int L[N_KNOTS_3D]);
 
 	virtual void assembleLocal(FinalElemBase finalElemBase) = 0;
 };

@@ -22,7 +22,7 @@ bool LOS::changeMemory(unsigned int n)
 	if (n == this->n) return true;
 	deleteMemory();
 	allocateMemory(n);
-
+	return true;
 }
 
 void LOS::deleteMemory()
@@ -37,8 +37,10 @@ void LOS::deleteMemory()
 int LOS::solve(Matrix &A, double* b, double* x, int maxiter, double eps)
 {
 	int n = A.n;
+	changeMemory(n);
 	int i, j, k;
 	double* f = b;
+
 	//cout << endl;
 	double err;
 	double begErr;

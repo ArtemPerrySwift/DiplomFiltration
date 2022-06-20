@@ -1,6 +1,5 @@
 #pragma once
 #include "sparsematrix.h"
-#include "array.h"
 #include <iostream>
 #include <iomanip>
 
@@ -16,6 +15,7 @@ protected:
 	double* z;
 	double* p;
 	double* buf_v;
+	double* f;
 
 	bool changeMemory(unsigned int n);
 	virtual void deleteMemory();

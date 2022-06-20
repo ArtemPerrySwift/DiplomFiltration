@@ -42,4 +42,6 @@ namespace arrayspace
 	bool isSameWithoutOrdUniqe(int* mas1, int* mas2, int n);
 
 	bool copyElemsByInd(int* masInd, double* masRes, double* masSor, int nResElems);
+
+	void plus(double* v, double* res, double a, int n);
 }

@@ -1,5 +1,49 @@
 #include "balance.h"
+#include "array.h"
 #include <set>
+
+Balance::Balance()
+{
+	nFace = 0;
+	betta = dQ = diBuf = bNew = NULL;
+	epsBalance = 1e-10;
+	alpha = 1;
+}
+void Balance::init(CalculationArea calculationArea)
+{
+	faceStore = calculationArea.faceStore;
+	flowStore = calculationArea.flowStore;
+	finitElementStore = calculationArea.finitElementStore;
+	changeMemory(faceStore.count);
+}
+
+bool Balance::allocateMemory(unsigned int n)
+{
+	nFace = n;
+	if (n == 0) return false;
+	betta = new double[n];
+	dQ = new double[n];
+	diBuf = new double[n];
+	bNew = new double[n];
+	return true;
+}
+
+bool Balance::changeMemory(unsigned int n)
+{
+	if (n == nFace) return true;
+	deleteMemory();
+	allocateMemory(n);
+	return true;
+}
+
+void Balance::deleteMemory()
+{
+	delete[] betta;
+	delete[] dQ;
+	delete[] diBuf;
+	delete[] bNew;
+	betta = dQ = diBuf = bNew = NULL;
+}
 
 void Balance::buildPortrait()
 {
@@ -52,7 +96,7 @@ void Balance::buildPortrait()
 
 void Balance::fillSlae()
 {
-	reculcBetta();
+	//reculcBetta();
 	int nElems = finitElementStore.nFinitElement;
 	FinitElement* finitElements = finitElementStore.finitElements;
 	double* flows = flowStore.flows;
@@ -124,3 +168,17 @@ bool Balance::reculcBetta()
 	return epsCur > epsBalance;
 }
 
+double Balance::functMin(double mean)
+{
+	double* errB = bNew;
+	arrayspace::plus(diBuf, slae.A.di, 1.0/mean, slae.A.n);
+	los_prec.solve(slae.A, slae.b, dQ, 10000, 1e-14);
+	slae.A.mult(dQ, bNew);
+	arrayspace::minus(slae.b, bNew, errB, slae.A.n);
+	return arrayspace::scal(errB, errB, slae.A.n);
+}
+
+void Balance::findAlpha()
+{
+
+}

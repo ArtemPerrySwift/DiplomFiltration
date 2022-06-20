@@ -169,4 +169,10 @@ namespace arrayspace
 
 		return true;
 	}
+
+	void plus(double* v, double* res, double a, int n)
+	{
+		for (int i = 0; i < n; i++)
+			res[i] = v[i] + a;
+	}
 }

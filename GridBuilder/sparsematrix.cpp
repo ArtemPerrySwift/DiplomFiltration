@@ -67,8 +67,8 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(ggl, M.ggl, n);
-		arrayspace::copy(ggu, M.ggu, n);
+		arrayspace::copy(ggl, M.ggl, ig[n]);
+		arrayspace::copy(ggu, M.ggu, ig[n]);
 		return true;
 	}
 
@@ -76,8 +76,8 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(ggl, M.gg, n);
-		arrayspace::copy(ggu, M.gg, n);
+		arrayspace::copy(ggl, M.gg, ig[n]);
+		arrayspace::copy(ggu, M.gg, ig[n]);
 		return true;
 	}
 
@@ -121,7 +121,7 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(gg, M.gg, n);
+		arrayspace::copy(gg, M.gg, ig[n]);
 		return true;
 	}
 
@@ -342,6 +342,51 @@ namespace matrix
 					if (isIndexFound)
 					{
 						cout << setw(COUT_WIDTH) << ggl[k] << " ";
+					}
+				}
+				if (!isIndexFound)
+					cout << setw(COUT_WIDTH) << 0.0 << " ";
+			}
+			cout << setw(COUT_WIDTH) << endl;
+		}
+	}
+
+	void SparseMatrixSym::printFullMatrix()
+	{
+		int COUT_WIDTH = 10;
+		cout << setw(COUT_WIDTH);
+		bool isIndexFound = false; // Ѕыл ли найден соответствующий индекс в массиве jg 
+		int c;
+		for (int i = 0; i < n; i++)
+		{
+			int i_beg = ig[i];
+			int i_end = ig[i + 1];
+			for (c = 0; c < jg[i_beg]; c++)
+				cout << setw(COUT_WIDTH) << 0.0 << " ";
+
+			for (int j = i_beg; j < i_end; j++)
+			{
+				for (; c < jg[j]; c++)
+					cout << setw(COUT_WIDTH) << 0.0 << " ";
+				cout << setw(COUT_WIDTH) << gg[j] << " ";
+				c++;
+			}
+			for (; c < i; c++)
+				cout << setw(COUT_WIDTH) << 0.0 << " ";
+
+			cout << setw(COUT_WIDTH) << di[i] << " ";
+
+			for (int j = i + 1; j < n; j++)
+			{
+				int j_beg = ig[j];
+				int j_end = ig[j + 1];
+				isIndexFound = false;
+				for (int k = j_beg; k < j_end && !isIndexFound; k++)
+				{
+					isIndexFound = (jg[k] == i);
+					if (isIndexFound)
+					{
+						cout << setw(COUT_WIDTH) << gg[k] << " ";
 					}
 				}
 				if (!isIndexFound)

@@ -151,7 +151,9 @@ void FEM::LinearTask()
 	//slae.count_LOS(q, 100000, 1e-14);
 	LOS los;
 	LOS_precond los_prec;
-	los.solve(slae.A, slae.b, q, 100000, 1e-14);
+	//slae.A.printFullMatrix();
+	los_prec.solve(slae.A, slae.b, q, 100000, 1e-14);
+	//los.solve(slae.A, slae.b, q, 100000, 1e-14);
 	//slae.count_LOS_Simple(q, 100000, 1e-14);
 	/*
 	slae.A.fillMatrix(0.0);

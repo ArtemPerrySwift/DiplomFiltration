@@ -21,6 +21,7 @@ namespace matrix
 		void buildPortrait(CoordStorage coordStorage, FinitElementStore finitElementStore);
 		void mult(double* v, double* res) override;
 		virtual void allocateMemoryForElems();
+		virtual void printFullMatrix() = 0;
 	protected:
 		//void copy();
 		void copyPortrait(SparseMatrix& M);
@@ -42,7 +43,7 @@ namespace matrix
 		void copy(SparseMatrixSym& M);
 
 		//operator SparseMatrixAsym() const;
-
+		void printFullMatrix() override;
 		void fillMatrix(double mean) override;
 		void allocateMemoryForElems() override;
 	private:
@@ -64,7 +65,7 @@ namespace matrix
 
 		int decomp_mat_LU(SparseMatrixAsym& LU);
 
-		void printFullMatrix();
+		void printFullMatrix() override;
 
 		void fillMatrix(double mean) override;
 		void allocateMemoryForElems() override;

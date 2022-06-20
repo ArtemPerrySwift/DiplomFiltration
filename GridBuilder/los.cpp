@@ -160,7 +160,7 @@ int LOS_precond::solve(SparseMatrixSym& A, double* b, double* x, int maxiter, do
 			}
 			err = sqrt(arrayspace::scal(r, r, n)) / norm_ff;
 			fl = i < maxiter&& err > eps;
-			cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
+			//cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
 			//itarations = i;
 			//nev = err;
 		}

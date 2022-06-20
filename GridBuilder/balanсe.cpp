@@ -73,7 +73,7 @@ void Balance::fillSlae()
 			iFace = iFinElemFaces[i];
 			for (j = 0; j < FACES_NUM; j++)
 			{
-				jFace = iFinElemFaces[j];
+				
 
 			}
 		}

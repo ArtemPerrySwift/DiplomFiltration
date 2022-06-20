@@ -587,6 +587,53 @@ namespace matrix
 			}
 		}
 	}
+
+	bool SparseMatrixSym::setElem(int i, int j, double elem)
+	{
+		int ind = getElemIndG(i, j);
+		if (ind == -1) return false;
+		gg[ind] = elem;
+		return true;
+	}
+
+	bool SparseMatrixAsym::setElem(int i, int j, double elem)
+	{
+		int ind = getElemIndG(i, j);
+		if (ind == -1) return false;
+		if (j > i)
+			ggu[ind] = elem;
+		if (j < i)
+			ggl[ind] = elem;
+		return true;
+	}
+
+	int SparseMatrix::getElemIndG(int i, int j)
+	{
+		if (i > n || i < 0 || j > n || j < 0 || i == j) return -1; // Позже можно будет прописать ошибки в вывод
+		if (j > i)
+		{
+			int buf = i;
+			i = j;
+			j = buf;
+		}
+
+		int k_left, k_right, ind;
+		k_left = ig[i];
+		k_right = ig[i + 1];
+		while (jg[k_left] != j)
+		{
+			ind = (k_left + k_right) / 2; // djpvj;yj
+			if (jg[ind] <= j)
+			{
+				k_left = ind;
+			}
+			else
+			{
+				k_right = ind;
+			}
+		}
+		return k_left;
+	}
 }
 
 

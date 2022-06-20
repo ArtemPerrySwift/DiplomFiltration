@@ -149,7 +149,7 @@ void FEM::LinearTask()
 	
 	std::cout << "Ðåøåíèå ÑËÀÓ" << std::endl;
 	//slae.count_LOS(q, 100000, 1e-14);
-	LOS los;
+	//LOS los;
 	LOS_precond los_prec;
 	//slae.A.printFullMatrix();
 	los_prec.solve(slae.A, slae.b, q, 100000, 1e-14);

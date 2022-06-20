@@ -81,12 +81,11 @@ void GlobalMatAssembler::addLocalToGlobalAll(SLAE<SparseMatrixSym>& slae, double
 {
 	int m, l;
 	int ind;
-	int k_left, k_right;
+	//int k_left, k_right;
 	double* di = slae.A.di;
-	double* ggl = slae.A.gg;
-	double* ggu = slae.A.gg;
-	int* ig = slae.A.ig;
-	int* jg = slae.A.jg;
+	double* gg = slae.A.gg;
+	//int* ig = slae.A.ig;
+	//int* jg = slae.A.jg;
 	double* b = slae.b;
 	for (m = 0; m < N_KNOTS_3D; m++)
 	{
@@ -98,8 +97,9 @@ void GlobalMatAssembler::addLocalToGlobalAll(SLAE<SparseMatrixSym>& slae, double
 	{
 		for (l = 0; l < m; l++)
 		{
-			s = L[m] > L[l] ? m : l;
-			d = L[m] > L[l] ? l : m;
+			//s = L[m] > L[l] ? m : l;
+			//d = L[m] > L[l] ? l : m;
+			/*
 			//if(L[m] > L[l]) s = 
 			k_left = ig[L[s]];
 			k_right = ig[L[s] + 1];
@@ -118,7 +118,10 @@ void GlobalMatAssembler::addLocalToGlobalAll(SLAE<SparseMatrixSym>& slae, double
 
 			ggl[k_left] += G_local[s][d] + M_local[s][d];
 			//ggu[k_left] += G_local[d][s] + M_local[d][s];
-			k_left++;
+			//k_left++;
+			*/
+			ind = slae.A.getElemIndG(L[m], L[l]);
+			gg[ind] += G_local[m][l] + M_local[m][l];
 		}
 	}
 }

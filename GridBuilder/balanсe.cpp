@@ -52,30 +52,64 @@ void Balance::buildPortrait()
 
 void Balance::fillSlae()
 {
-	//reculcBetta();
+	reculcBetta();
 	int nElems = finitElementStore.nFinitElement;
 	FinitElement* finitElements = finitElementStore.finitElements;
+	double* flows = flowStore.flows;
 	int iElem;
 	//FinitElement iFinitElement;
 	int* iFinElemFaces;
 	int i, j;
 	int iFace, jFace;
 
-	int* ig = slae.A.ig;
-	int* jg = slae.A.jg;
+	//int* ig = slae.A.ig;
+	//int* jg = slae.A.jg;
 	double* gg = slae.A.gg;
-	int iBeg, iEnd;
+	double* di = slae.A.di;
+	int ind;
+	signed char* signs;
+	double sumQ;
+	double* b = slae.b;
 	for (iElem = 0; iElem < nElems; iElem++)
 	{
 		iFinElemFaces = finitElements[iElem].faces;
+		signs = finitElements[iElem].flowSign;
+		sumQ = 0;
 		for (i = 0; i < FACES_NUM; i++)
 		{
 			iFace = iFinElemFaces[i];
-			for (j = 0; j < FACES_NUM; j++)
+			for (j = i + 1; j < FACES_NUM; j++)
 			{
-				
-
+				jFace = iFinElemFaces[j];
+				//ind = slae.A.getElemIndG(iFace, jFace);
+				slae.A.setElem(iFace, jFace, betta[i] * signs[i] * signs[j]);
 			}
+			sumQ += flows[iFace];
+		}
+
+		for (i = 0; i < FACES_NUM; i++)
+		{
+			iFace = iFinElemFaces[i];
+			di[iFace] = 2;
+			b[iFace] -= signs[i] * sumQ;
 		}
 	}
+}
+
+void Balance::reculcBetta()
+{
+	int nElems = finitElementStore.nFinitElement;
+	FinitElement* finitElements = finitElementStore.finitElements;
+	double* flows = flowStore.flows;
+	int iElem;
+	int* iFinElemFaces;
+	signed char* signs;
+	double sumQ;
+	for (iElem = 0; iElem < nElems; iElem++)
+	{
+		iFinElemFaces = finitElements[iElem].faces;
+		signs = finitElements[iElem].flowSign;
+		sumQ = 0;
+	}
+
 }

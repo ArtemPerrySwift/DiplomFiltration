@@ -52,7 +52,7 @@ void Balance::buildPortrait()
 
 void Balance::fillSlae()
 {
-	reculcBetta();
+	//reculcBetta();
 	int nElems = finitElementStore.nFinitElement;
 	FinitElement* finitElements = finitElementStore.finitElements;
 	int iElem;

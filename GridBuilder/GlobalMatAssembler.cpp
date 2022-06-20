@@ -4,7 +4,7 @@
 #include <conio.h>
 #include "programlog.h"
 
-void GlobalMatAssembler::assembleGlobalMatrix(SLAE& slae, CalculationArea& mesh, double* q)
+void GlobalMatAssembler::assembleGlobalMatrix(SLAE<SparseMatrixSym>& slae, CalculationArea& mesh, double* q)
 {
 	FinitElement* finalElements = mesh.finitElementStore.finitElements;
 	int ktr = mesh.finitElementStore.nFinitElement;
@@ -77,14 +77,14 @@ void GlobalMatAssembler::assembleGlobalMatrix(SLAE& slae, CalculationArea& mesh,
 	//getchar();
 }
 
-void GlobalMatAssembler::addLocalToGlobalAll(SLAE& slae, double G_local[N_KNOTS_3D][N_KNOTS_3D], double M_local[N_KNOTS_3D][N_KNOTS_3D], double localB[N_KNOTS_3D], int L[N_KNOTS_3D])
+void GlobalMatAssembler::addLocalToGlobalAll(SLAE<SparseMatrixSym>& slae, double G_local[N_KNOTS_3D][N_KNOTS_3D], double M_local[N_KNOTS_3D][N_KNOTS_3D], double localB[N_KNOTS_3D], int L[N_KNOTS_3D])
 {
 	int m, l;
 	int ind;
 	int k_left, k_right;
 	double* di = slae.A.di;
-	double* ggl = slae.A.ggl;
-	double* ggu = slae.A.ggu;
+	double* ggl = slae.A.gg;
+	double* ggu = slae.A.gg;
 	int* ig = slae.A.ig;
 	int* jg = slae.A.jg;
 	double* b = slae.b;
@@ -117,7 +117,7 @@ void GlobalMatAssembler::addLocalToGlobalAll(SLAE& slae, double G_local[N_KNOTS_
 			}
 
 			ggl[k_left] += G_local[s][d] + M_local[s][d];
-			ggu[k_left] += G_local[d][s] + M_local[d][s];
+			//ggu[k_left] += G_local[d][s] + M_local[d][s];
 			k_left++;
 		}
 	}

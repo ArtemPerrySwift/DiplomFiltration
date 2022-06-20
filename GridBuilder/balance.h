@@ -26,7 +26,7 @@ class Balance : NewtOptim
 	bool changeMemory(unsigned int n);
 	virtual void deleteMemory();
 	virtual bool allocateMemory(unsigned int n);
-	void findAlpha();
+	double findAlpha();
 	bool reculcBetta();
 
 public:
@@ -34,7 +34,7 @@ public:
 
 	void init(CalculationArea calculationArea);
 	void balanceFlows();
-	void setEpsBalanse();
+	bool setEpsBalanse(double eps);
 	//bool checkBalance();
 	
 	

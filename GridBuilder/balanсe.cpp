@@ -1,5 +1,6 @@
 #include "balance.h"
 #include "array.h"
+#include "programlog.h"
 #include <set>
 
 Balance::Balance()
@@ -175,10 +176,34 @@ double Balance::functMin(double mean)
 	los_prec.solve(slae.A, slae.b, dQ, 10000, 1e-14);
 	slae.A.mult(dQ, bNew);
 	arrayspace::minus(slae.b, bNew, errB, slae.A.n);
-	return arrayspace::scal(errB, errB, slae.A.n);
+	return abs(arrayspace::scal(errB, errB, slae.A.n) - eps);
 }
 
-void Balance::findAlpha()
-{
+double Balance::findAlpha() { return 1.0/calcMin(alpha); }
 
+bool Balance::setEpsBalanse(double eps)
+{
+	if (eps <= 0)
+	{
+		programlog::writeErr("Balanse epsilon is less or equal 0");
+		return false;
+	}
+		
+	epsBalance = eps;
+	return true;
+}
+
+void Balance::balanceFlows()
+{
+	arrayspace::fill_vec(dQ, nFace, 0);
+	while (reculcBetta())
+	{
+		fillSlae();
+		arrayspace::copy(diBuf, slae.A.di, nFace);
+		alpha = findAlpha();
+		arrayspace::plus(diBuf, slae.A.di, alpha, nFace);
+		los_prec.solve(slae.A, slae.b, dQ, 10000, 1e-14);
+	}
+
+	arrayspace::plus(flowStore.flows, dQ, flowStore.flows, nFace);
 }

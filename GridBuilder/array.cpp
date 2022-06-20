@@ -175,4 +175,10 @@ namespace arrayspace
 		for (int i = 0; i < n; i++)
 			res[i] = v[i] + a;
 	}
+
+	void plus(double* v1, double* v2, double* res, int n)
+	{
+		for (int i = 0; i < n; i++)
+			res[i] = v1[i] + v2[i];
+	}
 }

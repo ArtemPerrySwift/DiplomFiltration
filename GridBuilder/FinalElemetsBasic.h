@@ -11,7 +11,7 @@ public:
 	static const int N_KNOTS_3D = 8;
 
 	int globalInd[N_KNOTS_3D];
-
+	
 	void setFinalElement(FinitElement finalElement, CoordStorage knotsStorage);
 	void buildLocalM(double M[N_KNOTS_3D][N_KNOTS_3D], double gamma);
 	void buildLocalG(double G[N_KNOTS_3D][N_KNOTS_3D]);
@@ -20,13 +20,14 @@ public:
 
 	double calcSqare();
 	
-	double funcIntegrG(Coord transform);
+	double funcIntegrG(Coord eCord);
+	double funcIntegrM(Coord eCord);
 
 private:
-	static enum INTEG_CHOICE{INTEG_G, INTEG_SQARE};
+	static enum INTEG_CHOICE{INTEG_G, INTEG_M};
 	int integChoice;
 	int iGradPhi, jGradPhi;
-
+	int iPhi, jPhi;
 	FinitElement finitElement;
 	bool isLinear;
 

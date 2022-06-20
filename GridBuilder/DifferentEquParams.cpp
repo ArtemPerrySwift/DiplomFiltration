@@ -2,12 +2,14 @@
 
 double DifferentEquParams::f(double x, double y, double z)
 {
-	return -2;
+	return 0;
 }
 
 double DifferentEquParams::u1(double x, double y, double z)
 {
-	return 100;
+	if (x * x + y * y > 5)
+		return 100;
+	return -1004.29218357245;
 }
 
 double DifferentEquParams::du_dn(double x, double y, double z)

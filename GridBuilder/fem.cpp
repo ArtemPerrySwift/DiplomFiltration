@@ -102,6 +102,8 @@ void FEM::LinearTask()
 	addSecondConditions();
 	//addEmptyConditions();
 	addFirstConditions();
+
+	std::cout << setw(15) << setprecision(15) << slae.A.di[2074] << " " << slae.b[2074] << std::endl;
 	//slae.A.printFullMatrix();
 	/*
 	cout << "di" << endl;
@@ -149,11 +151,30 @@ void FEM::LinearTask()
 	
 	std::cout << "Ðåøåíèå ÑËÀÓ" << std::endl;
 	//slae.count_LOS(q, 100000, 1e-14);
-	//LOS los;
-	LOS_precond los_prec;
+	LOS los;
+	//LOS_precond los_prec;
 	//slae.A.printFullMatrix();
-	los_prec.solve(slae.A, slae.b, q, 100000, 1e-14);
-	//los.solve(slae.A, slae.b, q, 100000, 1e-14);
+	//los_prec.solve(slae.A, slae.b, q, 100000, 1e-14);
+	int nCoord = calculationArea.coordsStore.count;
+	double* bNew = new double[nCoord];
+	double* ansAn = new double[nCoord];
+	Coord p;
+	double sum = 0;
+	double sumx = 0;
+	for (int i = 0; i < nCoord; i++)
+	{
+		p = calculationArea.coordsStore.coords[i];
+		ansAn[i] = DifferentEquParams::u1(p.x, p.y, p.z);
+		sumx += p.x;
+		if(p.x == 500) sum += ansAn[i];
+	}
+	std::cout << "sum = " << sum << " " << sumx << std::endl;
+	slae.A.mult(ansAn, bNew);
+	for (int i = 1600; i < 1700; i++)
+	{
+		std::cout << slae.b[i] << " " << bNew[i] << " " << slae.b[i] - bNew[i] << std::endl;
+	}
+	los.solve(slae.A, slae.b, q, 100000, 1e-18);
 	//slae.count_LOS_Simple(q, 100000, 1e-14);
 	/*
 	slae.A.fillMatrix(0.0);

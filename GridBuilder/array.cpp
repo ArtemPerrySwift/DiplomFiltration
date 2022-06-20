@@ -149,7 +149,7 @@ namespace arrayspace
 			for (j = 0; j < n && fl; j++)
 			{
 				//if (i == j) continue;
-				fl = elem != mas2[i];
+				fl = elem != mas2[j];
 			}
 		}
 

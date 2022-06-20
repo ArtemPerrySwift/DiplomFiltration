@@ -96,7 +96,7 @@ void Balance::fillSlae()
 	}
 }
 
-void Balance::reculcBetta()
+bool Balance::reculcBetta()
 {
 	int nElems = finitElementStore.nFinitElement;
 	FinitElement* finitElements = finitElementStore.finitElements;
@@ -105,11 +105,22 @@ void Balance::reculcBetta()
 	int* iFinElemFaces;
 	signed char* signs;
 	double sumQ;
+	int i;
+	int iFace;
+	double epsCur = 0;
 	for (iElem = 0; iElem < nElems; iElem++)
 	{
 		iFinElemFaces = finitElements[iElem].faces;
 		signs = finitElements[iElem].flowSign;
 		sumQ = 0;
+		for (i = 0; i < FACES_NUM; i++)
+		{
+			iFace = iFinElemFaces[i];
+			sumQ += signs[i]*(flows[iFace] + dQ[iFace]);
+		}
+		epsCur += betta[iFace] * abs(sumQ);
+		betta[iFace] = epsBalance / (nElems * abs(sumQ));
 	}
-
+	return epsCur > epsBalance;
 }
+

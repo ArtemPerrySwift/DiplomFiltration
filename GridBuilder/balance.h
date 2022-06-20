@@ -22,7 +22,6 @@ public:
 	void balanceFlows();
 	bool checkBalance();
 	void setEpsBalanse();
-	void reculcBetta();
+	bool reculcBetta();
 	void findAlpha();
-	void trying();
 };

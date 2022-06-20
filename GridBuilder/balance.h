@@ -27,7 +27,7 @@ class Balance : NewtOptim
 	virtual void deleteMemory();
 	virtual bool allocateMemory(unsigned int n);
 	double findAlpha();
-	bool reculcBetta();
+	double reculcBetta();
 
 public:
 	Balance();

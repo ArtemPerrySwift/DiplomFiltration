@@ -2,12 +2,12 @@
 
 double DifferentEquParams::f(double x, double y, double z)
 {
-	return 0;
+	return -2;
 }
 
 double DifferentEquParams::u1(double x, double y, double z)
 {
-	return x;
+	return 100;
 }
 
 double DifferentEquParams::du_dn(double x, double y, double z)

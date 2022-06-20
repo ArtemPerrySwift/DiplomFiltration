@@ -16,6 +16,7 @@ void Balance::init(CalculationArea calculationArea)
 	flowStore = calculationArea.flowStore;
 	finitElementStore = calculationArea.finitElementStore;
 	changeMemory(faceStore.count);
+	buildPortrait();
 }
 
 bool Balance::allocateMemory(unsigned int n)
@@ -79,9 +80,9 @@ void Balance::buildPortrait()
 	{
 		ig[i + 1] = ig[i] + map[i].size();
 	}
-	int* jg = slae.A.jg;
+	
 	slae.A.jg = new int[ig[nFaces]];
-
+	int* jg = slae.A.jg;
 	int ijCount;
 
 	for (i = 0; i < nFaces; i++)
@@ -93,6 +94,7 @@ void Balance::buildPortrait()
 	}
 
 	slae.A.allocateMemoryForElems();
+	slae.b = new double[slae.A.n];
 }
 
 void Balance::fillSlae()
@@ -115,6 +117,7 @@ void Balance::fillSlae()
 	signed char* signs;
 	double sumQ;
 	double* b = slae.b;
+	arrayspace::fill_vec(b, nFace, 0);
 	for (iElem = 0; iElem < nElems; iElem++)
 	{
 		iFinElemFaces = finitElements[iElem].faces;
@@ -141,7 +144,7 @@ void Balance::fillSlae()
 	}
 }
 
-bool Balance::reculcBetta()
+double Balance::reculcBetta()
 {
 	int nElems = finitElementStore.nFinitElement;
 	FinitElement* finitElements = finitElementStore.finitElements;
@@ -164,9 +167,9 @@ bool Balance::reculcBetta()
 			sumQ += signs[i]*(flows[iFace] + dQ[iFace]);
 		}
 		epsCur += betta[iFace] * abs(sumQ);
-		betta[iFace] = epsBalance / (nElems * abs(sumQ));
+		betta[iFace] = 1 / (abs(sumQ));
 	}
-	return epsCur > epsBalance;
+	return epsCur;
 }
 
 double Balance::functMin(double mean)
@@ -176,7 +179,7 @@ double Balance::functMin(double mean)
 	los_prec.solve(slae.A, slae.b, dQ, 10000, 1e-14);
 	slae.A.mult(dQ, bNew);
 	arrayspace::minus(slae.b, bNew, errB, slae.A.n);
-	return abs(arrayspace::scal(errB, errB, slae.A.n) - eps);
+	return abs(arrayspace::scal(errB, errB, slae.A.n) - epsBalance);
 }
 
 double Balance::findAlpha() { return 1.0/calcMin(alpha); }
@@ -196,7 +199,8 @@ bool Balance::setEpsBalanse(double eps)
 void Balance::balanceFlows()
 {
 	arrayspace::fill_vec(dQ, nFace, 0);
-	while (reculcBetta())
+	arrayspace::fill_vec(betta, nFace, 1);
+	while (reculcBetta() > epsBalance)
 	{
 		fillSlae();
 		arrayspace::copy(diBuf, slae.A.di, nFace);
@@ -204,6 +208,16 @@ void Balance::balanceFlows()
 		arrayspace::plus(diBuf, slae.A.di, alpha, nFace);
 		los_prec.solve(slae.A, slae.b, dQ, 10000, 1e-14);
 	}
+	int* iFinElemFaces = finitElementStore.finitElements[0].faces;
+	signed char* signs = finitElementStore.finitElements[0].flowSign;
+	double sumQ = 0;
 
 	arrayspace::plus(flowStore.flows, dQ, flowStore.flows, nFace);
+
+	for (int i = 0; i < FACES_NUM; i++)
+	{
+		int iFace = iFinElemFaces[i];
+		sumQ += signs[i] * (flowStore.flows[iFace] + dQ[iFace]);
+	}
+
 }

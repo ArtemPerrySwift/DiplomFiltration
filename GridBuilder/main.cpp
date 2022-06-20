@@ -3,10 +3,13 @@
 #include "flows.h"
 #include "satculcer.h"
 #include "array.h"
+#include "balance.h"
 #include <iostream>
 #include <string>
 #include <direct.h>
 #include <iomanip>
+#include "DifferentEquParams.h"
+
 
 void Output2D(int it, double* q, CalculationArea calculationArea);
 
@@ -54,12 +57,15 @@ int main()
 	for (double x = 0.0; x < 1.0; x += 0.1)
 	{
 		p.x = x;
-		std::cout << x << " " << fem.countSolution(p) << std::endl;
+		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " "  << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z) << std::endl;
 	}
 	std::cout << endl;
 
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();
+	//Balance balance;
+	//balance.init(calculationArea);
+	//balance.balanceFlows();
 	outFlow.open("Flows.txt");
 	outFlow << "Time " << 0.0 << std::endl;
 	flowCulcer.printFlows(outFlow);

@@ -26,6 +26,7 @@ void FinalElemBase::buildLocalM(double M[N_KNOTS_3D][N_KNOTS_3D], double gamma)
 	int i, j;
 	Coord left(0, 0, 0);
 	Coord right(1, 1, 1);
+	integChoice = INTEG_M;
 	for (i = 0; i < N_KNOTS_3D; i++)
 	{
 		iPhi = i;
@@ -121,15 +122,9 @@ double FinalElemBase::funcIntegrM(Coord eCord)
 {
 	ECoord p;
 	p = eCord;
-	double x1[DIM], x2[DIM];
 	buildJ(J, p);
-
-	//std::cout << gradi.ksi << " " << gradi.nu << " " << gradi.etta << std::endl;
-	//std::cout << "\t \t \t –асчЄт определител€ матрицы якоби" << std::endl;
 	double DetJ = countDetMatrix3(J);
-	//std::cout << "\t \t \t –асчЄт определител€ матрицы якоби" << std::endl;
-	//std::cout << "\t \t \tItegrFunct End " << ans << std::endl;
-	return  phi_i(p, iGradPhi) * phi_i(p, iGradPhi) *arrayspace::scal(x1, x2, DIM) * abs(DetJ);
+	return  phi_i(p, iPhi) * phi_i(p, jPhi) * abs(DetJ);
 }
 
 void FinalElemBase::buildLocalG(double G[N_KNOTS_3D][N_KNOTS_3D])

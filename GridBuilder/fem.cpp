@@ -103,7 +103,7 @@ void FEM::LinearTask()
 	//addEmptyConditions();
 	addFirstConditions();
 
-	std::cout << setw(15) << setprecision(15) << slae.A.di[2074] << " " << slae.b[2074] << std::endl;
+	//std::cout << setw(15) << setprecision(15) << slae.A.di[2074] << " " << slae.b[2074] << std::endl;
 	//slae.A.printFullMatrix();
 	/*
 	cout << "di" << endl;
@@ -170,10 +170,10 @@ void FEM::LinearTask()
 	}
 	std::cout << "sum = " << sum << " " << sumx << std::endl;
 	slae.A.mult(ansAn, bNew);
-	for (int i = 1600; i < 1700; i++)
-	{
-		std::cout << slae.b[i] << " " << bNew[i] << " " << slae.b[i] - bNew[i] << std::endl;
-	}
+	//for (int i = 1600; i < 1700; i++)
+	//{
+	//	std::cout << slae.b[i] << " " << bNew[i] << " " << slae.b[i] - bNew[i] << std::endl;
+	//}
 	los.solve(slae.A, slae.b, q, 100000, 1e-18);
 	//slae.count_LOS_Simple(q, 100000, 1e-14);
 	/*

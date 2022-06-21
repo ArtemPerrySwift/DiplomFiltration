@@ -51,12 +51,12 @@ int main()
 	fem.getSolutWeights(q);
 	Output2D(0, q, calculationArea);
 	
-	Coord p(2, 0.5, 0.5);
+	Coord p(2, 0.0, 0.5);
 	std::cout << "r               Solution " << std::endl;
 	for (double x = 2.0; x < 499.0; x += 10)
 	{
 		p.x = x;
-		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " "  << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z) << std::endl;
+		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
 	}
 	std::cout << endl;
 

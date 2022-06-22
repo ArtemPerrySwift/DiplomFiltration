@@ -11,10 +11,10 @@ double NewtOptim::calcMin(double initBetta)
 	meanPrev = functMin(bettaPrev);
 	if (abs(meanPrev) < eps) return bettaPrev;
 
-	bettaCur = bettaCur == 0 ? 1 : bettaPrev * 1.2;
+	bettaCur = bettaPrev == 0 ? 1 : bettaPrev * 1.2;
 	meanCur = functMin(bettaCur);
 	double diff;
-	for (int i = 0; i < maxiter && abs(meanCur) < eps; i++)
+	for (int i = 0; i < maxiter && abs(meanCur) > eps; i++)
 	{
 		diff = diffFuntcMin(bettaCur);
 		if (diff == 0)

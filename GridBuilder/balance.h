@@ -10,24 +10,26 @@ class Balance : NewtOptim
 	FlowStore flowStore;
 	FinitElementStore finitElementStore;
 	slae::SLAE<SparseMatrixSym> slae;
-	LOS_precond los_prec;
+	LOS los;
 
 	double* betta;
 	double alpha;
 	double* dQ;
 	double* diBuf;
 	double* bNew;
-	int nFace;
+	int nFaces;
 	double epsBalance;
+	int nElems;
 
 	void buildPortrait();
 	void fillSlae();
 	double functMin(double mean) override;
-	bool changeMemory(unsigned int n);
+	bool changeMemory(unsigned int nFaces, unsigned int nElems);
 	virtual void deleteMemory();
 	virtual bool allocateMemory(unsigned int n);
 	double findAlpha();
 	double reculcBetta();
+	double calcDisbalanse();
 
 public:
 	Balance();

@@ -62,10 +62,15 @@ int main()
 
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();
-	//Balance balance;
-	//balance.init(calculationArea);
-	//balance.balanceFlows();
 	outFlow.open("Flows.txt");
+	outFlow << "Time " << 0.0 << std::endl;
+	flowCulcer.printFlows(outFlow);
+	outFlow << std::endl;
+
+	Balance balance;
+	balance.init(calculationArea);
+	balance.balanceFlows();
+	
 	outFlow << "Time " << 0.0 << std::endl;
 	flowCulcer.printFlows(outFlow);
 	outFlow << std::endl;

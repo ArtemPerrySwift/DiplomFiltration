@@ -52,13 +52,13 @@ int main()
 	Output2D(0, q, calculationArea);
 	
 	Coord p(2, 0.0, 0.5);
-	std::cout << "r               Solution " << std::endl;
-	for (double x = 2.0; x < 499.0; x += 10)
-	{
-		p.x = x;
-		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
-	}
-	std::cout << endl;
+	//std::cout << "r               Solution " << std::endl;
+	//for (double x = 2.0; x < 499.0; x += 10)
+	///{
+	//	p.x = x;
+	//	std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
+	//}
+	//std::cout << endl;
 
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();
@@ -88,12 +88,12 @@ int main()
 	satCulcer.printSat(outSat);
 	outSat << std::endl;
 	outSat.close();
-	return 0;
+	//return 0;
 
 	while (t < endT)
 	{
 		/*Расчёт давления*/
-		fem.init(calculationArea);
+		//fem.init(calculationArea);
 		outPress.open("Pressure.txt", std::ios_base::app);
 		outPress << "Time " << t << std::endl;
 		fem.printSolution(outPress);
@@ -106,12 +106,13 @@ int main()
 		flowCulcer.calcFlows();
 		outFlow.open("Flows.txt", std::ios_base::app);
 		outFlow << "Time " << t << std::endl;
+		balance.balanceFlows();
 		flowCulcer.printFlows(outFlow);
 		outFlow << std::endl;
 		outFlow.close();
 
 		/*Расчёт насыщенностей*/
-		satCulcer.init(calculationArea, endT - t);
+		//satCulcer.init(calculationArea, endT - t);
 		t += satCulcer.reculcSat();
 		outSat.open("Saturations.txt", std::ios_base::app);
 		outSat << "Time " << t << std::endl;

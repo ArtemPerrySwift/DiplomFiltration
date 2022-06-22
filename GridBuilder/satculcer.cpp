@@ -201,7 +201,8 @@ void SatCulcer::pushOutPhases()
 
 	std::set<PhaseOut>::iterator elem = phaseOut.begin();
 	nOutPhase = 0;
-	if(elem != phaseOut.end()) iElem = elem->iFinElem;
+	if (elem != phaseOut.end()) iElem = elem->iFinElem;
+	else return;
 	l = 0;
 	for (; elem != phaseOut.end(); elem++)
 	{
@@ -251,6 +252,40 @@ void SatCulcer::pushOutPhases()
 
 			iElem = elem->iFinElem;
 		}
+
+	}
+	finitElemBuf = finitElems[iElem];
+	poreVol = finitElemBuf.FI * finitElemBuf.sqare;
+	del = calcCoeffSum(finitElemBuf.phaseStorage);
+	sumCoeffPhase = 0;
+	for (i = 0; i < nPhases; i++)
+		sumCoeffPhase += outPhasesInd[i] ? 0 : calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del);
+
+	outQSum = calcOutQSum(finitElemBuf);
+
+	faceInd = finitElemBuf.faces;
+	phasesEl = finitElemBuf.phaseStorage.phases;
+	for (i = 0; i < FACES_NUM; i++)
+	{
+		iFace = faceInd[i];
+		for (j = 0; j < nPhases; j++)
+		{
+			if (outPhasesInd[j])
+			{
+				faceVolBuf = phaseVolStore[j].PhaseVol[iFace] = flows[iFace] / outQSum * poreVol * phasesEl[j].saturation;
+				phaseVolStoreMix.PhaseVol[iFace] -= faceVolBuf;
+			}
+		}
+	}
+
+	for (i = 0; i < FACES_NUM; i++)
+	{
+		iFace = faceInd[i];
+		for (j = 0; j < nPhases; j++)
+		{
+			if (!outPhasesInd[j])
+				phaseVolStore[j].PhaseVol[iFace] = calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del) / sumCoeffPhase* phaseVolStoreMix.PhaseVol[iFace];
+		}
 	}
 }
 
@@ -293,7 +328,7 @@ void SatCulcer::calcNewSat()
 	}
 }
 
-void SatCulcer::calcBorderVol(BorderFacesStore borderFacesStore, double dt)
+void SatCulcer::calcBorderVol(BorderFacesPhases borderFacesStore, double dt)
 {
 	int* iFaces = borderFacesStore.iFaces;
 	int nFaces = borderFacesStore.nFaces;

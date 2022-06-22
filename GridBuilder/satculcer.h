@@ -41,7 +41,7 @@ private:
 	double calcCoeffSum(PhaseStorage phaseStorage);
 	double calcAllVol(double dt);
 	void calcNewSat();
-	void calcBorderVol(BorderFacesStore borderFacesStore, double dt);
+	void calcBorderVol(BorderFacesPhases borderFacesStore, double dt);
 public:
 	void init(CalculationArea calculationArea, double dtMax);
 	void printSat(std::ofstream &out);

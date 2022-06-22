@@ -39,7 +39,7 @@ namespace arrayspace
 
 	int serchInSorted(int* mas, int iBeg, int n, int elem);
 
-	bool isSameWithoutOrdUniqe(int* mas1, int* mas2, int n);
+	bool isSameWithoutOrdUniqe(const int* mas1, const int* mas2, const int n);
 
 	bool copyElemsByInd(int* masInd, double* masRes, double* masSor, int nResElems);
 

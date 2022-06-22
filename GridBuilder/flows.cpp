@@ -21,6 +21,7 @@ void FlowCulcer::init(CalculationArea calculationArea, double* q)
 	nFlows = calculationArea.flowStore.count;
 	flows = calculationArea.flowStore.flows;
 
+	/*
 	if (qN != n)
 	{
 		delete[] this->q;
@@ -29,8 +30,8 @@ void FlowCulcer::init(CalculationArea calculationArea, double* q)
 	}
 
 	arrayspace::copy(this->q, q, n);
-
-	arrayspace::fill_vec(flows, calculationArea.flowStore.count, 0);
+	*/
+	this->q = q;
 
 }
 
@@ -55,6 +56,7 @@ bool FlowCulcer::isInnerN(int iLocalFace)
 
 void FlowCulcer::calcFlows()
 {
+	arrayspace::fill_vec(flows, calculationArea.flowStore.count, 0);
 	FinitElement* finitElements = calculationArea.finitElementStore.finitElements;
 	int nElems = calculationArea.finitElementStore.nFinitElement;
 	Face* faces = calculationArea.faceStore.faces;

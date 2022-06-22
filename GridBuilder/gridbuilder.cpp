@@ -613,7 +613,9 @@ CalculationArea::CalculationArea(std::string fileNameCord, std::string fileNameS
 	fill1CondKnots(XYZ, borders, wellStorage);
 
 	std::cout << "Заполнение информации о гранях со вторыми краевыми условиями" << std::endl;
-	fillCondFaces(XYZ, borders, wellStorage);
+	fillCondFaces( XYZ, borders, wellStorage);
+
+
 
 	std::cout << "Выделение памяти под объёмы фаз" << std::endl;
 	containerPhaseVol.init(faceStore, areas.nPhases);
@@ -723,6 +725,7 @@ CalculationArea::CalculationArea() {};
 
 bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorders borders, WellStorage wellStorage)
 {
+	FaceStore Faces2CondStore; // Грани со вторыми краевыми
 	int i_x1, i_x2, j_y1, j_y2, k_z1, k_z2;
 	int i_x, j_y, k_z;
 	int ind;
@@ -883,6 +886,12 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 		}
 
 	}
+
+	faces2CondStore.nFaces = n;
+	faces2CondStore.iFaces = new int[n];
+	int* iFaces = faces2CondStore.iFaces;
+	for (i = 0; i < n; i++)
+		iFaces[i] = faceStore.findFaceIndex(cond2Faces[i]);
 
 	return 0;
 }
@@ -1284,6 +1293,17 @@ bool AreaPhaseStorage::readData(std::ifstream& in, int i)
 	return true;
 }
 
+FaceStore::FaceStore()
+{
+	nBufLookingCenter = 0;
+	nBufLookingArea = 10;
+	ig = NULL;
+	jg = NULL;
+	n = 0;
+	count = 0;
+	faces = NULL;
+}
+
 //---------------FacesStore-------------//
 bool FaceStore::init(FinitElementStore& finitElementStore, int nCoord)
 {
@@ -1509,6 +1529,46 @@ void FaceStore::copyStore(FaceStore& facesStore, int nFaces)
 	Face* otherFaces = facesStore.faces;
 	for (int i = 0; i < nFaces; i++)
 		faces[i] = otherFaces[i];
+}
+
+int FaceStore::findFaceIndex(const Face& face)
+{
+	int i;
+	int nFaces = count;
+	int lBufLookindBorder = nBufLookingCenter > nBufLookingArea ? nBufLookingCenter - nBufLookingArea : 0;
+	int rBufLookindBorder = nBufLookingCenter + nBufLookingArea < nFaces ? nBufLookingCenter + nBufLookingArea : nFaces;
+	//FinitElement* finitElements = calculationArea.finitElementStore.finitElements;
+	bool isElemFound;
+	double ans;
+	for (i = nBufLookingCenter; i < rBufLookindBorder; i++)
+	{
+		//finitElemCulcer.init(finitElements[i], calculationArea.coordsStore, q);
+		//ans = finitElemCulcer.countFunct(p, isElemFound);
+		if (arrayspace::isSameWithoutOrdUniqe(faces[i].knots, face.knots, VER_NUM_FACE))
+		{
+			nBufLookingCenter = i;
+			return i;
+		}
+	}
+	for (i = lBufLookindBorder; i < nBufLookingCenter; i++)
+	{
+		if (arrayspace::isSameWithoutOrdUniqe(faces[i].knots, face.knots, VER_NUM_FACE))
+		{
+			nBufLookingCenter = i;
+			return i;
+		}
+	}
+
+	for (i = 0; i < nFaces; i++)
+	{
+		if (arrayspace::isSameWithoutOrdUniqe(faces[i].knots, face.knots, VER_NUM_FACE))
+		{
+			nBufLookingCenter = i;
+			return i;
+		}
+	}
+	programlog::writeErr("The point in which solution is searching is out of Calculation Area");
+	return -1;
 }
 
 int FaceStore::findNeighboringFinitElem(int indFinElem, FinitElement& finitElement, int iLocalFace)

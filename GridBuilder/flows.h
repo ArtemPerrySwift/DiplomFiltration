@@ -18,6 +18,7 @@ public:
 	void init(CalculationArea calculationArea, double* q);
 	void calcFlows();
 	double* getflows();
+	void setPressure(double* q);
 	void printFlows(std::ofstream &out);
 
 };

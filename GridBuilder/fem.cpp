@@ -51,8 +51,9 @@ void FEM::addFirstConditions()
 void FEM::addSecondConditions()
 {
 	std::cout << "Учёт вторых краевых условий" << std::endl;
-	Face* faces = calculationArea.Faces2CondStore.faces;
-	int n = calculationArea.Faces2CondStore.count;
+	Face* faces = calculationArea.faceStore.faces;
+	int n = calculationArea.faces2CondStore.nFaces;
+	int* iFaces = calculationArea.faces2CondStore.iFaces;
 	int n_basic = FaceBasic2Cond::N_BASIC;
 	FaceBasic2Cond faceBasic2Cond;
 	double LocalB[FaceBasic2Cond::N_BASIC];
@@ -63,7 +64,7 @@ void FEM::addSecondConditions()
 	double* b = slae.b;
 	for (i = 0; i < n; i++)
 	{
-		faceBasic2Cond.init(faces[i], calculationArea.coordsStore);
+		faceBasic2Cond.init(faces[iFaces[i]], calculationArea.coordsStore);
 		faceBasic2Cond.calcAddLocalB(LocalB);
 		iFaceCoord = faces[i].knots;
 		for (j = 0; j < n_basic; j++)

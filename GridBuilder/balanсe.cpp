@@ -234,6 +234,7 @@ double Balance::functMin(double mean)
 {
 	double* errB = bNew;
 	arrayspace::plus(diBuf, slae.A.di, 1.0/mean, slae.A.n);
+	add2Cond();
 	los.solve(slae.A, slae.b, dQ, 10000, 1e-14);
 
 	//slae.A.mult(dQ, bNew);
@@ -264,16 +265,17 @@ void Balance::balanceFlows()
 	{
 		//arrayspace::fill_vec(betta, nFaces, 1);
 		fillSlae();
-		slae.A.printFullMatrix();
-		for (int i = 0; i < nFaces; i++)
-			std::cout << slae.b[i] << std::endl;
+		//slae.A.printFullMatrix();
+		//for (int i = 0; i < nFaces; i++)
+		//	std::cout << slae.b[i] << std::endl;
 		arrayspace::copy(diBuf, slae.A.di, nFaces);
 		alpha = findAlpha();
 		arrayspace::plus(diBuf, slae.A.di, alpha, nFaces);
+		add2Cond();
 		los.solve(slae.A, slae.b, dQ, 10000, 1e-14);
-		std::cout << "Balance Solut" << std::endl;
-		for (int i = 0; i < nFaces; i++)
-			std::cout << dQ[i] << std::endl;
+		//std::cout << "Balance Solut" << std::endl;
+		//for (int i = 0; i < nFaces; i++)
+		//	std::cout << dQ[i] << std::endl;
 	}
 
 	int* iFinElemFaces = finitElementStore.finitElements[0].faces;
@@ -282,10 +284,59 @@ void Balance::balanceFlows()
 
 	arrayspace::plus(flowStore.flows, dQ, flowStore.flows, nFaces);
 
-	for (int i = 0; i < FACES_NUM; i++)
-	{
-		int iFace = iFinElemFaces[i];
-		sumQ += signs[i] * (flowStore.flows[iFace] + dQ[iFace]);
-	}
+	//for (int i = 0; i < FACES_NUM; i++)
+	//{
+	//	int iFace = iFinElemFaces[i];
+	//	sumQ += signs[i] * (flowStore.flows[iFace] + dQ[iFace]);
+	//}
+	refreshFlowSigns();
+}
 
+void Balance::add2Cond()
+{
+	int n2Faces = faces2CondStore.nFaces;
+	int* iFaces = faces2CondStore.iFaces;
+
+	for (int i = 0; i < n2Faces; i++)
+		slae.setOneVariableSolve(iFaces[i], 0);
+}
+
+void Balance::refreshFlowSigns()
+{
+	int iElem;
+	int iLocalFace;
+	int iGlobalFace;
+	int iNegbFinElem;
+	int* currVerFace;
+	int	NeighbVerFace[VER_NUM_FACE];
+	int k;
+	int nElems = finitElementStore.nFinitElement;
+	FinitElement iFinitElement;
+	FinitElement* finitElements = finitElementStore.finitElements;
+	double* flows = flowStore.flows;
+	Face* faces = faceStore.faces;
+	for (iElem = 0; iElem < nElems; iElem++)
+	{
+		iFinitElement = finitElements[iElem];
+		for (iLocalFace = 0; iLocalFace < FACES_NUM; iLocalFace++)
+		{
+			iGlobalFace = iFinitElement.faces[iLocalFace];
+			if (flows[iGlobalFace] < 0)
+			{
+				finitElements[iElem].flowSign[iLocalFace] *= -1;
+				flows[iGlobalFace] = abs(flows[iGlobalFace]);
+				iNegbFinElem = faceStore.findNeighboringFinitElem(iElem, iFinitElement, iLocalFace);
+				if (iNegbFinElem > -1)
+				{
+					currVerFace = faces[iGlobalFace].knots;
+					for (k = 0; k < FACES_NUM; k++)
+					{
+						finitElements[iNegbFinElem].getFaceGlobalNum(k, NeighbVerFace);
+						if (arrayspace::isSameWithoutOrdUniqe(NeighbVerFace, currVerFace, VER_NUM_FACE))
+							finitElements[iNegbFinElem].flowSign[k] *= -1;
+					}
+				}
+			}
+		}
+	}
 }

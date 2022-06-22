@@ -137,7 +137,7 @@ namespace arrayspace
 		return i;
 	}
 
-	bool isSameWithoutOrdUniqe(int* mas1, int* mas2, int n)
+	bool isSameWithoutOrdUniqe(const int* mas1, const int* mas2, const int n)
 	{
 		int i, j;
 		int elem;

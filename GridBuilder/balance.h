@@ -9,6 +9,7 @@ class Balance : NewtOptim
 	FaceStore faceStore;
 	FlowStore flowStore;
 	FinitElementStore finitElementStore;
+	BorderFacesStore faces2CondStore;
 	slae::SLAE<SparseMatrixSym> slae;
 	LOS los;
 
@@ -30,7 +31,8 @@ class Balance : NewtOptim
 	double findAlpha();
 	double reculcBetta();
 	double calcDisbalanse();
-
+	void add2Cond();
+	void refreshFlowSigns();
 public:
 	Balance();
 

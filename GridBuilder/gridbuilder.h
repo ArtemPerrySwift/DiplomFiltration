@@ -78,7 +78,6 @@ private:
 struct BorderEmptyStorage : Storage
 {
 	BorderEmptyC* borders;
-
 private:
 	virtual bool allocateMemory();
 	virtual bool readData(std::ifstream& in, int i);
@@ -295,21 +294,28 @@ struct BorderFacesStore
 {
 	int* iFaces;
 	int nFaces;
-	PhaseStorage phaseStorage;
 	void copyBorderFacesStore(BorderFacesStore borderFacesStore, int nFaces);
+};
+
+struct BorderFacesPhases :BorderFacesStore
+{
+	PhaseStorage phaseStorage;
 };
 
 struct FaceStore
 {
 	Face* faces;
 	int count;
+	FaceStore();
 	bool init(FinitElementStore& finitElementStore, int nCoord);
 	bool createFaceStore(FinitElementStore& finitElementStore);
 	bool createFaceStore(FinitElementStore& finitElementStore, BorderFacesStore& borderFacesStore);
 	int findNeighboringFinitElem(int iFinElem, FinitElement& finitElement, int iLocalFace);
 	void copyStore(FaceStore& facesStore, int nFaces);
+	int findFaceIndex(const Face& face);
 private:
-
+	int nBufLookingCenter;
+	int nBufLookingArea;
 	int* ig;
 	int* jg;
 	int n;
@@ -436,12 +442,13 @@ struct WellCordStore
 	bool buildWellGrid(CoordStorageXYZ XYZ);
 };
 */
+/*
 struct FaceHelper
 {
 	FaceStore& facesStore;
 	
 };
-
+*/
 struct KnotsWithFirstConditionStorage
 {
 	int* IKnots;
@@ -464,8 +471,9 @@ struct CalculationArea // пространственная сетка
 	FlowStore flowStore; // Потоки через границы
 	ContainerPhaseVol containerPhaseVol; // Объёмы перетекающих фаз
 	FaceStore faceStore; // Грани
-	FaceStore Faces2CondStore; // Грани со вторыми краевыми
-	BorderFacesStore borderFacesStore; // Грани на границе расчётной области
+	BorderFacesStore faces2CondStore;
+
+	BorderFacesPhases borderFacesStore; // Грани на границе расчётной области
 	double endT; // Время до которого производиться расчёт
 	int nPhases;
 

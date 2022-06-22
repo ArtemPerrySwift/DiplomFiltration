@@ -221,33 +221,36 @@ void SatCulcer::pushOutPhases()
 			del = calcCoeffSum(finitElemBuf.phaseStorage);
 			sumCoeffPhase = 0;
 			for (i = 0; i < nPhases; i++)
-				sumCoeffPhase += outPhasesInd[i] ? 0: calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del);
+				sumCoeffPhase += outPhasesInd[i] ? 0 : calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del);
 
 			outQSum = calcOutQSum(finitElemBuf);
-			
+
 			faceInd = finitElemBuf.faces;
 			phasesEl = finitElemBuf.phaseStorage.phases;
+			signed char* flowSigns = finitElemBuf.flowSign;
 			for (i = 0; i < FACES_NUM; i++)
 			{
 				iFace = faceInd[i];
-				for (j = 0; j < nPhases; j++)
-				{
-					if (outPhasesInd[j])
+				if (flowSigns[i] > 0)
+					for (j = 0; j < nPhases; j++)
 					{
-						faceVolBuf = phaseVolStore[j].PhaseVol[iFace] = flows[iFace] / outQSum * poreVol * phasesEl[j].saturation;
-						phaseVolStoreMix.PhaseVol[iFace] -= faceVolBuf;
+						if (outPhasesInd[j])
+						{
+							faceVolBuf = phaseVolStore[j].PhaseVol[iFace] = flows[iFace] / outQSum * poreVol * phasesEl[j].saturation;
+							phaseVolStoreMix.PhaseVol[iFace] -= faceVolBuf;
+						}
 					}
-				}
 			}
 
 			for (i = 0; i < FACES_NUM; i++)
 			{
 				iFace = faceInd[i];
-				for (j = 0; j < nPhases; j++)
-				{
-					if (!outPhasesInd[j])
-						phaseVolStore[j].PhaseVol[iFace] = calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del) * sumCoeffPhase;
-				}
+				if (flowSigns[i] > 0)
+					for (j = 0; j < nPhases; j++)
+					{
+						if (!outPhasesInd[j])
+							phaseVolStore[j].PhaseVol[iFace] = calcPhaseCoeff(finitElemBuf.phaseStorage.phases[j], del) / sumCoeffPhase * phaseVolStoreMix.PhaseVol[iFace];
+					}
 			}
 
 			iElem = elem->iFinElem;
@@ -265,9 +268,11 @@ void SatCulcer::pushOutPhases()
 
 	faceInd = finitElemBuf.faces;
 	phasesEl = finitElemBuf.phaseStorage.phases;
+	signed char* flowSigns = finitElemBuf.flowSign;
 	for (i = 0; i < FACES_NUM; i++)
 	{
 		iFace = faceInd[i];
+		if(flowSigns[i] > 0)
 		for (j = 0; j < nPhases; j++)
 		{
 			if (outPhasesInd[j])
@@ -281,10 +286,11 @@ void SatCulcer::pushOutPhases()
 	for (i = 0; i < FACES_NUM; i++)
 	{
 		iFace = faceInd[i];
+		if (flowSigns[i] > 0)
 		for (j = 0; j < nPhases; j++)
 		{
 			if (!outPhasesInd[j])
-				phaseVolStore[j].PhaseVol[iFace] = calcPhaseCoeff(finitElemBuf.phaseStorage.phases[i], del) / sumCoeffPhase* phaseVolStoreMix.PhaseVol[iFace];
+				phaseVolStore[j].PhaseVol[iFace] = calcPhaseCoeff(finitElemBuf.phaseStorage.phases[j], del) / sumCoeffPhase* phaseVolStoreMix.PhaseVol[iFace];
 		}
 	}
 }

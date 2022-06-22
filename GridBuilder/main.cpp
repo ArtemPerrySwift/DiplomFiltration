@@ -3,10 +3,13 @@
 #include "flows.h"
 #include "satculcer.h"
 #include "array.h"
+#include "balance.h"
 #include <iostream>
 #include <string>
 #include <direct.h>
 #include <iomanip>
+#include "DifferentEquParams.h"
+
 
 void Output2D(int it, double* q, CalculationArea calculationArea);
 
@@ -15,7 +18,6 @@ int main()
 	CalculationArea calculationArea("CoordAndAreas.txt", "SepParams.txt", "Borders.txt");
 	//std::ofstream out;
 
-	
 	FEM fem;
 	
 	//fem.init(calculationArea);
@@ -49,17 +51,20 @@ int main()
 	fem.getSolutWeights(q);
 	Output2D(0, q, calculationArea);
 	
-	Coord p(2, 0.5, 0.5);
+	Coord p(2, 0.0, 0.5);
 	std::cout << "r               Solution " << std::endl;
-	for (double x = 0.0; x < 1.0; x += 0.1)
+	for (double x = 2.0; x < 499.0; x += 10)
 	{
 		p.x = x;
-		std::cout << x << " " << fem.countSolution(p) << std::endl;
+		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
 	}
 	std::cout << endl;
 
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();
+	//Balance balance;
+	//balance.init(calculationArea);
+	//balance.balanceFlows();
 	outFlow.open("Flows.txt");
 	outFlow << "Time " << 0.0 << std::endl;
 	flowCulcer.printFlows(outFlow);

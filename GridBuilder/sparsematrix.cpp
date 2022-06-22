@@ -67,8 +67,8 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(ggl, M.ggl, n);
-		arrayspace::copy(ggu, M.ggu, n);
+		arrayspace::copy(ggl, M.ggl, ig[n]);
+		arrayspace::copy(ggu, M.ggu, ig[n]);
 		return true;
 	}
 
@@ -76,8 +76,8 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(ggl, M.gg, n);
-		arrayspace::copy(ggu, M.gg, n);
+		arrayspace::copy(ggl, M.gg, ig[n]);
+		arrayspace::copy(ggu, M.gg, ig[n]);
 		return true;
 	}
 
@@ -121,7 +121,7 @@ namespace matrix
 	{
 		if (!SparseMatrix::copyElems(M)) return false;
 		if (M.ig[n] != ig[n]) return false;
-		arrayspace::copy(gg, M.gg, n);
+		arrayspace::copy(gg, M.gg, ig[n]);
 		return true;
 	}
 
@@ -351,6 +351,51 @@ namespace matrix
 		}
 	}
 
+	void SparseMatrixSym::printFullMatrix()
+	{
+		int COUT_WIDTH = 10;
+		cout << setw(COUT_WIDTH);
+		bool isIndexFound = false; // Был ли найден соответствующий индекс в массиве jg 
+		int c;
+		for (int i = 0; i < n; i++)
+		{
+			int i_beg = ig[i];
+			int i_end = ig[i + 1];
+			for (c = 0; c < jg[i_beg]; c++)
+				cout << setw(COUT_WIDTH) << 0.0 << " ";
+
+			for (int j = i_beg; j < i_end; j++)
+			{
+				for (; c < jg[j]; c++)
+					cout << setw(COUT_WIDTH) << 0.0 << " ";
+				cout << setw(COUT_WIDTH) << gg[j] << " ";
+				c++;
+			}
+			for (; c < i; c++)
+				cout << setw(COUT_WIDTH) << 0.0 << " ";
+
+			cout << setw(COUT_WIDTH) << di[i] << " ";
+
+			for (int j = i + 1; j < n; j++)
+			{
+				int j_beg = ig[j];
+				int j_end = ig[j + 1];
+				isIndexFound = false;
+				for (int k = j_beg; k < j_end && !isIndexFound; k++)
+				{
+					isIndexFound = (jg[k] == i);
+					if (isIndexFound)
+					{
+						cout << setw(COUT_WIDTH) << gg[k] << " ";
+					}
+				}
+				if (!isIndexFound)
+					cout << setw(COUT_WIDTH) << 0.0 << " ";
+			}
+			cout << setw(COUT_WIDTH) << endl;
+		}
+	}
+
 	void SparseMatrix::buildPortrait(CoordStorage coordStorage, FinitElementStore finitElementStore)
 	{
 		set<int>* map;
@@ -541,6 +586,53 @@ namespace matrix
 				x[j] -= gg[ij] * x[i];
 			}
 		}
+	}
+
+	bool SparseMatrixSym::setElem(int i, int j, double elem)
+	{
+		int ind = getElemIndG(i, j);
+		if (ind == -1) return false;
+		gg[ind] = elem;
+		return true;
+	}
+
+	bool SparseMatrixAsym::setElem(int i, int j, double elem)
+	{
+		int ind = getElemIndG(i, j);
+		if (ind == -1) return false;
+		if (j > i)
+			ggu[ind] = elem;
+		if (j < i)
+			ggl[ind] = elem;
+		return true;
+	}
+
+	int SparseMatrix::getElemIndG(int i, int j)
+	{
+		if (i > n || i < 0 || j > n || j < 0 || i == j) return -1; // Позже можно будет прописать ошибки в вывод
+		if (j > i)
+		{
+			int buf = i;
+			i = j;
+			j = buf;
+		}
+
+		int k_left, k_right, ind;
+		k_left = ig[i];
+		k_right = ig[i + 1];
+		while (jg[k_left] != j)
+		{
+			ind = (k_left + k_right) / 2; // djpvj;yj
+			if (jg[ind] <= j)
+			{
+				k_left = ind;
+			}
+			else
+			{
+				k_right = ind;
+			}
+		}
+		return k_left;
 	}
 }
 

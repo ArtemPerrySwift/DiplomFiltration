@@ -155,7 +155,7 @@ void FlowCulcer::calcFlows()
 				}
 			}
 			else
-				flows[iFace] = flowLoc[j] / 2;
+				flows[iFace] = flowLoc[j];
 			/*
 			if (flows[iFace] * flowLoc[j] < 0)
 			{

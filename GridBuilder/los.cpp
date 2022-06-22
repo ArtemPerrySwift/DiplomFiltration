@@ -1,9 +1,9 @@
 #include "los.h"
-
+#include "array.h";
 LOS::LOS()
 {
 	n = 0;
-	r = z = p = buf_v = NULL;
+	r = z = p = buf_v = f = NULL;
 }
 
 bool LOS::allocateMemory(unsigned int n)
@@ -13,6 +13,7 @@ bool LOS::allocateMemory(unsigned int n)
 	r = new double[n];
 	z = new double[n];
 	p = new double[n];
+	f = new double[n];
 	buf_v = new double[n];
 	return true;
 }
@@ -39,7 +40,8 @@ int LOS::solve(Matrix &A, double* b, double* x, int maxiter, double eps)
 	int n = A.n;
 	changeMemory(n);
 	int i, j, k;
-	double* f = b;
+	arrayspace::copy(f, b, n);
+	f = b;
 
 	//cout << endl;
 	double err;
@@ -101,7 +103,8 @@ int LOS_precond::solve(SparseMatrixSym& A, double* b, double* x, int maxiter, do
 {
 	changeMemory(A.n);
 	LLt.decompMatrix(A);
-	double * f = b;
+	arrayspace::copy(f, b, n);
+	f = b;
 	int n = A.n;
 	int i, j, k;
 	double norm_ff = sqrt(arrayspace::scal(f, f, n));
@@ -160,7 +163,7 @@ int LOS_precond::solve(SparseMatrixSym& A, double* b, double* x, int maxiter, do
 			}
 			err = sqrt(arrayspace::scal(r, r, n)) / norm_ff;
 			fl = i < maxiter&& err > eps;
-			cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
+			//cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
 			//itarations = i;
 			//nev = err;
 		}

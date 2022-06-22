@@ -1,6 +1,10 @@
 #include "newtoptim.h"
 #include <cmath>
-
+NewtOptim::NewtOptim()
+{
+	maxiter = 1000;
+	eps = 1e-14;
+}
 double NewtOptim::calcMin(double initBetta)
 {
 	bettaPrev = initBetta;
@@ -26,6 +30,7 @@ double NewtOptim::calcMin(double initBetta)
 
 double NewtOptim::diffFuntcMin(double mean)
 {
+	minPossibleMeanEps = eps < 1 ? DBL_MIN / eps : DBL_MIN * eps;
 	if (abs((meanCur - meanPrev) / meanCur) < eps)
 	{
 		bool bettaCurChanged = false;

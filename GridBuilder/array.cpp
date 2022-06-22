@@ -149,7 +149,7 @@ namespace arrayspace
 			for (j = 0; j < n && fl; j++)
 			{
 				//if (i == j) continue;
-				fl = elem != mas2[i];
+				fl = elem != mas2[j];
 			}
 		}
 
@@ -168,5 +168,17 @@ namespace arrayspace
 			masRes[i] = masSor[masInd[i]];
 
 		return true;
+	}
+
+	void plus(double* v, double* res, double a, int n)
+	{
+		for (int i = 0; i < n; i++)
+			res[i] = v[i] + a;
+	}
+
+	void plus(double* v1, double* v2, double* res, int n)
+	{
+		for (int i = 0; i < n; i++)
+			res[i] = v1[i] + v2[i];
 	}
 }

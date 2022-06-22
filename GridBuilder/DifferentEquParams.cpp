@@ -7,7 +7,9 @@ double DifferentEquParams::f(double x, double y, double z)
 
 double DifferentEquParams::u1(double x, double y, double z)
 {
-	return x;
+	//if (x * x + y * y < 16)
+		return 200 * log(sqrt(x * x + y * y)) - 1142.92162;
+	//return 100;
 }
 
 double DifferentEquParams::du_dn(double x, double y, double z)

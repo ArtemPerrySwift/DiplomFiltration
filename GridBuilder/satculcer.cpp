@@ -308,7 +308,7 @@ void SatCulcer::calcBorderVol(BorderFacesStore borderFacesStore, double dt)
 
 	for (j = 0; j < nFaces; j++)
 	{
-		flows[iFaces[j]] *= 2;
+		//flows[iFaces[j]] *= 2;
 		phaseVolStoreMix.PhaseVol[iFaces[j]] = flows[iFaces[j]] * dt;
 	}
 

@@ -3,6 +3,7 @@
 class NewtOptim
 {
 public:
+	NewtOptim();
 	double calcMin(double initMean);
 	unsigned int maxiter;
 protected:
@@ -13,5 +14,5 @@ private:
 	double minPossibleMeanEps;
 	double bettaCur, bettaPrev;
 	double meanCur, meanPrev;
-	bool fl;
+	//bool fl;
 };

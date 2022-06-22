@@ -73,8 +73,23 @@ namespace slae
 		int ind_current;
 		for (i_ind = ind_beg; i_ind < ind_end; i_ind++)
 		{
+			
 			b_ind = jg[i_ind];
+			/*
+			if (b[b_ind] != 0)
+			{
+				if ((abs(b[b_ind] - gg[i_ind] * varMean) / b[b_ind]) < 1e-14)
+				{
+					b[b_ind] = 0;
+				}
+				else
+					b[b_ind] -= gg[i_ind] * varMean;
+				
+			}
+			else
+			*/
 			b[b_ind] -= gg[i_ind] * varMean;
+
 			gg[i_ind] = 0;
 		}
 
@@ -87,6 +102,20 @@ namespace slae
 			{
 				if (jg[i_ind] == ind_current)
 				{
+					/*
+					if (b[iVar] != 0)
+					{
+						if ((abs(b[iVar] - gg[i_ind] * varMean) / b[iVar]) < 1e-14)
+						{
+							b[iVar] = 0;
+						}
+						else
+							b[iVar] -= gg[i_ind] * varMean;
+
+					}
+					else
+						b[iVar] -= gg[i_ind] * varMean;
+					*/
 					b[iVar] -= gg[i_ind] * varMean;
 					gg[i_ind] = 0;
 				}

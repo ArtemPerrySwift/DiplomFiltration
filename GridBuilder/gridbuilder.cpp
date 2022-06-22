@@ -216,6 +216,8 @@ bool SepParamStorage::readData(std::ifstream& in, int i)
 {
 	SepParam sepParamBuf;
 	in >> sepParamBuf.n >> sepParamBuf.q;
+	if (sepParamBuf.q < 0)
+		sepParamBuf.q = 1 / abs(sepParamBuf.q);
 	sepParams[i] = sepParamBuf;
 	return true;
 }
@@ -658,7 +660,7 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 	int* iCondWells = borderStorageWell.iWells;
 
 	for (i = 0; i < nCondWells; i++)
-		n += wellStorage.wells[iCondWells[i]].getNumWellFaces();
+		n += wellStorage.wells[iCondWells[i]].getNumWellKnots();
 
 
 	knots1Cond.IKnots = new int[n];
@@ -700,15 +702,15 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 	for (i = 0; i < nCondWells; i++)
 	{
 		wellBuf = wellStorage.wells[iCondWells[i]];
-		coordEnd = wellBuf.nCoords;
+		coordEnd = wellBuf.nCircleCoords;
 		sirfEnd = wellBuf.nSirfs;
-		jCircle = wellBuf.nCircle;
+		jCircle = wellBuf.nCircle - 1;
 		int iCoord, kSirf;
 		for (kSirf = sirfBeg; kSirf < sirfEnd; kSirf++)
 		{
 			for (iCoord = coordBeg; iCoord < coordEnd; iCoord++, iknot++)
 			{
-				Iknots[iknot] = wellBuf.getKnotIndex(coordBeg, jCircle, kSirf);
+				Iknots[iknot] = wellBuf.globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
 			}
 		}
 
@@ -1827,6 +1829,12 @@ int Well::buildWellGrid(CoordStorageXYZ XYZ, SepParam sepParam, AreaStorage& are
 		ix2 = cordEmptyInd[1],
 		jy1 = cordEmptyInd[2],
 		jy2 = cordEmptyInd[3];
+
+	int dix = (ix2 - ix1) / 2,
+		djy = (jy2 - jy1) / 2;
+
+	sepParam.n = dix > sepParam.n ? dix : sepParam.n;
+	sepParam.n = djy > sepParam.n ? djy : sepParam.n;
 
 	nCircle = sepParam.n + 1;
 	nSirfs = XYZ.nZ;

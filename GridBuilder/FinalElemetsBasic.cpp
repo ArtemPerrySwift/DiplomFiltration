@@ -18,20 +18,23 @@ void FinalElemBase::setFinalElement(FinitElement finalElement, CoordStorage knot
 		coords[i] = knotsStorage.coords[globalInd[i]];
 
 	/*Пока без понятия как там рополагаются x и y так что это место довольно опасное, если работать не будет, то  возможно ошибка здесь*/
-	
-	
-	
+		
 }
+
 void FinalElemBase::buildLocalM(double M[N_KNOTS_3D][N_KNOTS_3D], double gamma)
 {
 	int i, j;
-
+	Coord left(0, 0, 0);
+	Coord right(1, 1, 1);
+	integChoice = INTEG_M;
 	for (i = 0; i < N_KNOTS_3D; i++)
 	{
+		iPhi = i;
 		for (j = i; j < N_KNOTS_3D; j++)
 		{
+			jPhi = j;
 			//M[i][j] = gamma*LOCAL_MATRIX_M_1[i % 2][j % 2] * LOCAL_MATRIX_M_1[i / 2][j / 2] * hx * hy / 36.0;
-			M[i][j] = 0;
+			M[i][j] = gamma * integrateGausse(left, right);;
 			M[j][i] = M[i][j];
 		}
 	}
@@ -58,12 +61,9 @@ double FinalElemBase::integrFunct(Coord p)
 	switch (integChoice)
 	{
 	case INTEG_G:
-		//std::cout << " IntegrFunct is gouing to be counted " << std::endl;
-		mean = funcIntegrG(p);
-		//std::cout << " IntegrFunct is counted " << mean << std::endl;
-		return mean;
-	case INTEG_SQARE:
-		return functIntegSqare(p);
+		return funcIntegrG(p);
+	case INTEG_M:
+		return funcIntegrM(p);
 	}
 	return  funcIntegrG(p);
 }
@@ -81,7 +81,7 @@ double FinalElemBase::functIntegSqare(Coord eCoord)
 
 double FinalElemBase::calcSqare()
 {
-	integChoice = INTEG_SQARE;
+	integChoice = INTEG_M;
 
 	Coord left(0, 0, 0);
 	Coord right(1, 1, 1);
@@ -116,6 +116,15 @@ double FinalElemBase::funcIntegrG(Coord eCord)
 	
 	//std::cout << "\t \t \tItegrFunct End " << ans << std::endl;
 	return  arrayspace::scal(x1, x2, DIM) * abs(DetJ);
+}
+
+double FinalElemBase::funcIntegrM(Coord eCord)
+{
+	ECoord p;
+	p = eCord;
+	buildJ(J, p);
+	double DetJ = countDetMatrix3(J);
+	return  phi_i(p, iPhi) * phi_i(p, jPhi) * abs(DetJ);
 }
 
 void FinalElemBase::buildLocalG(double G[N_KNOTS_3D][N_KNOTS_3D])

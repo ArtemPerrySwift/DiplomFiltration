@@ -21,6 +21,9 @@ namespace matrix
 		void buildPortrait(CoordStorage coordStorage, FinitElementStore finitElementStore);
 		void mult(double* v, double* res) override;
 		virtual void allocateMemoryForElems();
+		virtual void printFullMatrix() = 0;
+		virtual bool setElem(int i, int j, double elem) = 0;
+		int getElemIndG(int i, int j);
 	protected:
 		//void copy();
 		void copyPortrait(SparseMatrix& M);
@@ -40,11 +43,12 @@ namespace matrix
 		SparseMatrixSym();
 
 		void copy(SparseMatrixSym& M);
-
+		
 		//operator SparseMatrixAsym() const;
-
+		void printFullMatrix() override;
 		void fillMatrix(double mean) override;
 		void allocateMemoryForElems() override;
+		bool setElem(int i, int j, double elem) override;
 	private:
 		bool copyElems(SparseMatrixSym& M);
 		void multMatElemAndVecElem(int i, int j, int ij, double* v, double* res) override;
@@ -64,10 +68,11 @@ namespace matrix
 
 		int decomp_mat_LU(SparseMatrixAsym& LU);
 
-		void printFullMatrix();
+		void printFullMatrix() override;
 
 		void fillMatrix(double mean) override;
 		void allocateMemoryForElems() override;
+		bool setElem(int i, int j, double elem) override;
 	private:
 		bool copyElems(SparseMatrixAsym& M);
 		bool copyElems(SparseMatrixSym& M);

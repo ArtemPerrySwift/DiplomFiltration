@@ -341,13 +341,6 @@ struct ContainerPhaseVol
 	void init(FaceStore faceStore, int nPhases);
 };
 
-struct FacePhaseStore
-{
-	int* iFace;
-	Phase* phases;
-
-	void init();
-};
 
 struct FinElementFaces
 {

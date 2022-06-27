@@ -13,6 +13,7 @@ private:
 	FaceBasic faceBasic;
 	FinitElement finitElem;
 	Coord locCoords[VER_NUM];
+	FaceStore faceStore;
 	double locQ[VER_NUM];
 
 	int locFaceInd[VER_NUM_FACE];

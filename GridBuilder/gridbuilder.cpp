@@ -493,7 +493,7 @@ bool ContainerSepParam::readSepParams(int nSepX, int nSepY, int nSepZ, int nSepW
 	{
 		sepX.multiplySeParams(coeff);
 		sepY.multiplySeParams(coeff);
-		sepZ.multiplySeParams(coeff);
+		//sepZ.multiplySeParams(coeff);
 		sepW.multiplySeParams(coeff);
 	}
 	return true;

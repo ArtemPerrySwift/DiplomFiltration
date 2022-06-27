@@ -9540,3 +9540,11 @@ Wed Jun 22 20:05:41 2022
  [Error] - The point in which solution is searching is out of Calculation Area
 Wed Jun 22 20:05:41 2022
  [Error] - The point in which solution is searching is out of Calculation Area
+Thu Jun 23 16:11:45 2022
+ [Error] - Error of reading file CoordAndAreas.txt - Error of reading elements count
+Thu Jun 23 16:11:45 2022
+ [Error] - Error of reading file SepParams.txt - elements count cannot be < 0
+Thu Jun 23 16:13:15 2022
+ [Error] - Error of reading file CoordAndAreas.txt - Error of reading elements count
+Thu Jun 23 16:13:15 2022
+ [Error] - Error of reading file SepParams.txt - elements count cannot be < 0

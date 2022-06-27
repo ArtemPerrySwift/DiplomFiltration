@@ -313,10 +313,10 @@ struct FaceStore
 	int findNeighboringFinitElem(int iFinElem, FinitElement& finitElement, int iLocalFace);
 	void copyStore(FaceStore& facesStore, int nFaces);
 	int findFaceIndex(const Face& face);
+	int* ig;
 private:
 	int nBufLookingCenter;
-	int nBufLookingArea;
-	int* ig;
+	int nBufLookingArea;	
 	int* jg;
 	int n;
 };

@@ -10,8 +10,8 @@
 #include <iomanip>
 #include "DifferentEquParams.h"
 
-
-void Output2D(int it, double* q, CalculationArea calculationArea);
+const int N_TIMES = 100;
+void Output2D(int it, double* q, CalculationArea calculationArea, double t);
 
 int main()
 {
@@ -49,17 +49,17 @@ int main()
 	outPress.close();
 	outPress << std::endl;
 	fem.getSolutWeights(q);
-	Output2D(0, q, calculationArea);
-	
+	Output2D(0, q, calculationArea, 0);
+	//return 0;
 	Coord p(2, 0.0, 0.5);
 	//std::cout << "r               Solution " << std::endl;
 	//for (double x = 2.0; x < 499.0; x += 10)
 	///{
 	//	p.x = x;
-	//	std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
+		//std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
 	//}
 	//std::cout << endl;
-
+	
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();
 	outFlow.open("Flows.txt");
@@ -89,9 +89,16 @@ int main()
 	outSat << std::endl;
 	outSat.close();
 	//return 0;
-
-	while (t < endT)
+	FinitElemCulcer finitElemCulcer;
+	int nElems = calculationArea.finitElementStore.nFinitElement;
+	FinitElement* finitElements = calculationArea.finitElementStore.finitElements;
+	bool isElemFound = false;
+	double ans;
+	//std::cout.scientific;
+	//endT = 1.7e-4;
+	for(int i = 1; t < endT && i < N_TIMES; i++)
 	{
+		//std::cout << std::scientific << "Time " << t << " begin to count" << std::endl;
 		/*Расчёт давления*/
 		//fem.init(calculationArea);
 		outPress.open("Pressure.txt", std::ios_base::app);
@@ -119,7 +126,44 @@ int main()
 		satCulcer.printSat(outSat);
 		outSat << std::endl;
 		outSat.close();
+		//std::cout << std::scientific << "Time " << t << " end to count" << std::endl;
+		//if (t > 0.5) return 0;
+		for (double x = 0.1; x < 499.0; x += 10)
+		{
+			p.y = x;
+			isElemFound = false;
+			for (int i = 0; i < nElems && !isElemFound; i++)
+			{
+				finitElemCulcer.init(finitElements[i], calculationArea.coordsStore, q);
+				ans = finitElemCulcer.countFunct(p, isElemFound);
+				if (isElemFound)
+				{
+					std::cout << x << " " << finitElements[i].phaseStorage.phases[0].saturation << " " << finitElements[i].phaseStorage.phases[1].saturation << std::endl;//return ans;
+				}
+			}
+
+		}
+		Output2D(i, q, calculationArea, t);
 	}
+	
+	for (double x = 0.1; x < 499.0; x += 10)
+	{
+		p.x = x;
+		isElemFound = false;
+		for (int i = 0; i < nElems && !isElemFound; i++)
+		{
+			finitElemCulcer.init(finitElements[i], calculationArea.coordsStore, q);
+			ans = finitElemCulcer.countFunct(p, isElemFound);
+			if (isElemFound)
+			{
+				std::cout << p.x << " " << finitElements[i].phaseStorage.phases[0].saturation << " " << finitElements[i].phaseStorage.phases[1].saturation << std::endl;//return ans;
+			}
+		}
+		
+	}
+	
+
+
 	//qN = calculationArea.faceStore.count;
 	/*
 	int nX = calculationArea.XYZ.nX;
@@ -167,7 +211,7 @@ __forceinline std::istream& operator > (std::istream& file, int& data)
 	return file;
 }
 
-void Output2D(int it, double* q, CalculationArea calculationArea)
+void Output2D(int it, double* q, CalculationArea calculationArea, double t)
 {
 	const int SCALE_PRINT = 1; // Не знаю что это такое
 	std::cout << "!!!!!!!!!!!!!Scale = " << SCALE_PRINT << std::endl;
@@ -178,6 +222,9 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 	FinitElement* finitElems = calculationArea.finitElementStore.finitElements;
 	Coord* coords = calculationArea.coordsStore.coords;
 	int i, j;
+	int* nKnotElems = calculationArea.faceStore.ig;
+	double* qPhase1 = new double[kuslov];
+	double* qPhase2 = new double[kuslov];
 	std::string pathInput = "output2D_temperature";
 	if (it == 0)
 	{
@@ -211,7 +258,7 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 
 			/*Непонятно зачем но без этого вроде как работать не будет, так что это необходиомо оставить*/
 			for (int j = 0; j < 6; j++)
-				ofp < 1;
+				ofp < 2;
 			
 		}
 		ofp.close();
@@ -232,7 +279,7 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 
 		path = pathInput + "/nvkat.dat";
 		ofp.open(path, std::ios::binary);
-		/*Непонятно зачем но без этого вроде как работать не будет, так что это необходиомо оставить*/
+		/*Ставиться номер материала на конечном элементе*/
 		for (int i = 0; i < kolel; i++)
 		{
 			ofp < 1;
@@ -246,7 +293,6 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 		for (int uz = 0; uz < kuslov; uz++)
 		{
 			ofp < 1;
-			ofp < 1;
 		}
 		ofp.close();
 		ofp.clear();
@@ -257,7 +303,7 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 		/*Непонятно зачем но без этого вроде как работать не будет, так что это необходиомо оставить*/
 		ofp << "4" << std::endl;
 		ofp << std::endl;
-		ofp << "Temperature" << std::endl;
+		ofp << "Pressure" << std::endl;
 		ofp << "Displacement - X" << std::endl;
 		ofp << "Displacement - Y" << std::endl;
 		ofp << "Displacement - Z" << std::endl;
@@ -268,16 +314,39 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 		path = pathInput + "\\times_main";
 		/*Заполняем временные слои вроде как (пока что временной слой один)*/
 		ouf.open(path);
-		ouf << 1 << std::scientific << std::setprecision(15) << std::endl;
-		ouf << 1.0 << std::endl;
+		ouf << N_TIMES << std::scientific << std::setprecision(15) << std::endl;
+		//ouf << 0.0 << std::endl;
+		//ouf << 0.1 << std::endl;
 		/*
 		* На случай нескольких временных слоёв
 		ouf << TimeGrid.size() << scientific << setprecision(15) << std::endl;
 		for (int i = 0; i < TimeGrid.size(); i++)
 			ouf << (double)TimeGrid[i] / (3600.0 * 24.0) << std::endl;
 		*/
-		ouf.clear();
 		ouf.close();
+		ouf.clear();
+		
+	}
+	
+
+	arrayspace::fill_vec(qPhase1, kuslov, 0);
+	arrayspace::fill_vec(qPhase2, kuslov, 0);
+
+	for (int i = 0; i < kolel; i++)
+	{
+		/*Заплняем информацию об i-ом конечном элементе*/
+		for (int j = 0; j < kolVerInel; j++)
+		{
+			qPhase1[finitElems[i].ver[j]] += finitElems[i].phaseStorage.phases[0].saturation;
+			qPhase2[finitElems[i].ver[j]] += finitElems[i].phaseStorage.phases[1].saturation;
+		}
+
+	}
+
+	for (int i = 0; i < kuslov; i++)
+	{
+		qPhase1[i] /= nKnotElems[i + 1] - nKnotElems[i];
+		qPhase2[i] /= nKnotElems[i + 1] - nKnotElems[i];
 	}
 
 	std::string path = pathInput + "\\sx." + std::to_string(it);
@@ -286,12 +355,54 @@ void Output2D(int it, double* q, CalculationArea calculationArea)
 	for (int i = 0; i < kuslov; i++) {
 		ofp3 < q[i];
 	}
+	ofp3.close();
+	ofp3.clear();
+
+	path = pathInput + "\\sy." + std::to_string(it);
+	ofp3.open(path, std::ios::binary);
+	for (int i = 0; i < kuslov; i++) {
+		ofp3 < qPhase1[i];
+	}
+	ofp3.close();
+	ofp3.clear();
+
+	path = pathInput + "\\sz." + std::to_string(it);
+	ofp3.open(path, std::ios::binary);
+	for (int i = 0; i < kuslov; i++) {
+		ofp3 < qPhase2[i];
+	}
+	ofp3.close();
+	ofp3.clear();
+
+	std::ofstream ouf;
+	path = pathInput + "\\times_main";
+	/*Заполняем временные слои вроде как (пока что временной слой один)*/
+	ouf.open(path, std::ios::app);
+	ouf << t << std::endl;
 
 	/*
 	for (int i = 0; i < mesh.koluz; i++) {
 		ofp3 < T[i];
 	}
 	*/
+	path = pathInput + "/materials";
+	std::ofstream ofp;
+	ofp.open(path, std::ios::binary);
+	ofp << 1;
+	ofp << 1;
+	ofp << 1;
+
 	ofp3.close();
 	ofp3.clear();
+	/*
+	path = pathInput + "\\sx." + std::to_string(it + 1);
+	ofp3.open(path, std::ios::binary);
+	for (int i = 0; i < kuslov; i++) {
+		ofp3 < q[i];
+	}
+	ofp3.close();
+	ofp3.clear();
+	*/
+	delete[] qPhase1;
+	delete[] qPhase2;
 }

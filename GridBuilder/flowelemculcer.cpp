@@ -2,6 +2,7 @@
 #include "array.h"
 #include "slae.h"
 #include "vectgeom.h"
+#include "DifferentEquParams.h"
 
 void FlowElemCulcer::init(FinitElement finitElem, CoordStorage coordsStore, double* q)
 {
@@ -87,7 +88,8 @@ void FlowElemCulcer::getFlows(double flows[FACES_NUM], signed char flowsSigns[FA
 	for (int i = 0; i < FACES_NUM; i++)
 	{
 		prepDataForGetFaceFlow(i);
-		flow = integrateGausse(left, right);
+		flow = -integrateGausse(left, right);
+		
 		flow *= isInnerN(i) ? -1 : 1;
 
 		flowsSigns[i] = flow < 0 ? -1: 1;

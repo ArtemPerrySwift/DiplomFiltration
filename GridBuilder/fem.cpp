@@ -25,9 +25,10 @@ void FEM::init(CalculationArea& calculationArea)
 	
 	//descr = bForCheck;
 	arrayspace::fill_vec(q, A.n, 0.0);
-	LinearTask();
 	nBufLookingArea = 10;
 	nBufLookingCenter = 0;
+	LinearTask();
+	
 }
 
 void FEM::addFirstConditions()
@@ -196,6 +197,7 @@ double* FEM::getSolutWeights()
 
 void FEM::getSolutWeights(double* &qRes)
 {
+	LinearTask();
 	arrayspace::copy(qRes, q, slae.A.n);
 }
 

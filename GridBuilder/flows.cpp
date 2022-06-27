@@ -20,7 +20,7 @@ void FlowCulcer::init(CalculationArea calculationArea, double* q)
 	int n = calculationArea.coordsStore.count;
 	nFlows = calculationArea.flowStore.count;
 	flows = calculationArea.flowStore.flows;
-
+	outPhaseStorage = calculationArea.borderFacesStore.phaseStorage;
 	/*
 	if (qN != n)
 	{
@@ -119,6 +119,15 @@ void FlowCulcer::calcFlows()
 			iNeibElem = calculationArea.faceStore.findNeighboringFinitElem(i, finitElements[i], j);
 			if (iNeibElem != -1)
 			{
+				if (finitElements[i].flowSign[j] > 0)
+				{
+					flowLoc[j] *= DifferentEquParams::lambda(finitElement.K, finitElement.phaseStorage.phases, finitElement.phaseStorage.count);
+				}
+				else
+				{
+					flowLoc[j] *= DifferentEquParams::lambda(finitElements[iNeibElem].K, finitElements[iNeibElem].phaseStorage.phases, finitElements[iNeibElem].phaseStorage.count);
+				}
+
 				if (iNeibElem > i)
 				{
 					flows[iFace] = flowLoc[j] / 2;
@@ -157,7 +166,18 @@ void FlowCulcer::calcFlows()
 				}
 			}
 			else
+			{
+				if (finitElements[i].flowSign[j] > 0)
+				{
+					flowLoc[j] *= DifferentEquParams::lambda(finitElement.K, finitElement.phaseStorage.phases, finitElement.phaseStorage.count);
+				}
+				else
+				{
+					flowLoc[j] *= DifferentEquParams::lambda(finitElement.K, outPhaseStorage.phases, outPhaseStorage.count);
+				}
 				flows[iFace] = flowLoc[j];
+			}
+				
 			/*
 			if (flows[iFace] * flowLoc[j] < 0)
 			{

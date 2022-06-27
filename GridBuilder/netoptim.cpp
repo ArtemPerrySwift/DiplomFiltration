@@ -40,7 +40,7 @@ double NewtOptim::diffFuntcMin(double mean)
 			bettaCur = minPossibleMeanEps;
 			bettaCurChanged = true;
 		}
-		while (abs((meanCur - meanPrev) / meanCur) < eps && abs((bettaCur - bettaPrev)/bettaCur) > eps)
+		while (abs((meanCur - meanPrev) / meanCur) > eps && abs((bettaCur - bettaPrev)/bettaCur) > eps)
 		{
 			bettaPrev = 1.0 / 2.0 * (bettaCur - bettaPrev);
 			meanPrev = functMin(bettaPrev);

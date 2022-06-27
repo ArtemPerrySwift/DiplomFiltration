@@ -93,8 +93,8 @@ int LOS::solve(Matrix &A, double* b, double* x, int maxiter, double eps)
 		//nev = err;
 	}
 	//progressBar.end();
-	std::cout << std::endl;
-	cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
+	//std::cout << std::endl;
+	//cout << setprecision(14) << "iteration: " << i << "; err: " << err << endl;
 	if (i == maxiter) return 1;
 	return 0;
 }

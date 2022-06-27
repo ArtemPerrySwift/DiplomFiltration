@@ -8,6 +8,7 @@
 class FlowCulcer
 {
 	CalculationArea calculationArea;
+	PhaseStorage outPhaseStorage;
 	double* q;
 	int qN;
 	double* flows;

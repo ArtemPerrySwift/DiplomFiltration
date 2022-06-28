@@ -9748,3 +9748,7 @@ Mon Jun 27 16:10:25 2022
  [Error] - The point in which solution is searching is out of Calculation Area
 Mon Jun 27 16:10:25 2022
  [Error] - The point in which solution is searching is out of Calculation Area
+Tue Jun 28 12:58:56 2022
+ [Error] - Solving of SNE reached the limit of iterations
+Tue Jun 28 12:58:56 2022
+ [Error] - Solving of SNE reached the limit of iterations

@@ -16,7 +16,14 @@ double DifferentEquParams::u1(double x, double y, double z, int functNum)
 
 double DifferentEquParams::du_dn(double x, double y, double z, int functNum)
 {
-	return -100;
+	switch (functNum)
+	{
+	default:
+	case 0: return -2;
+	case 1: return 1;
+	case 2: return 1;
+	}
+	//return -100;
 	//return -100;
 }
 

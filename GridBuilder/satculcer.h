@@ -28,7 +28,8 @@ private:
 	double dtMax;
 	CalculationArea calculationArea;
 	double* flows;
-	
+	double* phaseSatGen;
+	double genPoreVol;
 	std::vector<PhaseOut> phaseSatSmin;
 	std::vector<PhaseOut> phaseSatSmax;
 	std::set<PhaseOut> phaseOut;
@@ -42,8 +43,11 @@ private:
 	double calcAllVol(double dt);
 	void calcNewSat();
 	void calcBorderVol(BorderFacesPhases borderFacesStore, double dt);
+	void calcGenSat();
+	void calcGenPoreVol();
 public:
 	void init(CalculationArea calculationArea, double dtMax);
 	void printSat(std::ofstream &out);
 	double reculcSat();
+	double getGenPhaseSat(int iPhase);
 };

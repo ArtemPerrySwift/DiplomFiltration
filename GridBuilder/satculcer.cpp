@@ -10,6 +10,9 @@ void SatCulcer::init(CalculationArea calculationArea, double dtMax)
 	this->calculationArea = calculationArea;
 	flows = calculationArea.flowStore.flows;
 	this->dtMax = dtMax;
+	phaseSatGen = new double[calculationArea.containerPhaseVol.count];
+	calcGenPoreVol();
+	calcGenSat();
 }
 
 double SatCulcer::choose_dt()
@@ -369,6 +372,7 @@ double SatCulcer::reculcSat()
 	calcAllVol(dt);
 	pushOutPhases();
 	calcNewSat();
+	calcGenSat();
 	return dt;
 }
 
@@ -406,9 +410,57 @@ void SatCulcer::printSat(std::ofstream &out)
 		out << "____________________";
 }
 
+void SatCulcer::calcGenSat()
+{
+	int nPhases = calculationArea.nPhases;
+	FinitElement* finitElems = calculationArea.finitElementStore.finitElements;
+	FinitElement finitElem;
+	int nFinEl = calculationArea.finitElementStore.nFinitElement;
+	int iPhase, jElem;
+	double poreVol;
+	for (iPhase = 0; iPhase < nPhases; iPhase++)
+		phaseSatGen[iPhase] = 0;
+	
+	for (jElem = 0; jElem < nFinEl; jElem++)
+	{
+		finitElem = finitElems[jElem];
+		poreVol = finitElem.FI * finitElem.sqare;
+
+		for (iPhase = 0; iPhase < nPhases; iPhase++)
+			phaseSatGen[iPhase] += finitElems[jElem].phaseStorage.phases[iPhase].saturation*poreVol;
+		
+	}
+
+	for (iPhase = 0; iPhase < nPhases; iPhase++)
+		phaseSatGen[iPhase] /= genPoreVol;
+
+}
+
+double SatCulcer::getGenPhaseSat(int iPhase)
+{
+	if (iPhase < 0 || iPhase > calculationArea.nPhases)
+		return -1;
+
+	return phaseSatGen[iPhase];
+}
+
+void SatCulcer::calcGenPoreVol()
+{
+	genPoreVol = 0;
+	FinitElement* finitElems = calculationArea.finitElementStore.finitElements;
+	int nFinEl = calculationArea.finitElementStore.nFinitElement;
+
+	for (int i = 0; i < nFinEl; i++)
+		genPoreVol += finitElems[i].FI * finitElems[i].sqare;
+	
+}
+
 bool operator <(const PhaseOut& left, const PhaseOut& right)
 {
 	if (left.iFinElem == right.iFinElem)
 		return left.iPhase < right.iPhase;
 	return left.iFinElem < right.iFinElem;
 }
+
+
+

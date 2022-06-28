@@ -86,6 +86,7 @@ private:
 struct BorderStorageWell : Storage
 {
 	int* iWells;
+	int* functNums;
 	int nWells;
 private:
 	virtual bool allocateMemory();
@@ -293,6 +294,7 @@ struct Face
 struct BorderFacesStore
 {
 	int* iFaces;
+	int* functNums;
 	int nFaces;
 	void copyBorderFacesStore(BorderFacesStore borderFacesStore, int nFaces);
 };
@@ -452,6 +454,7 @@ struct FaceHelper
 struct KnotsWithFirstConditionStorage
 {
 	int* IKnots;
+	int* functNums;
 	int kt1;
 };
 

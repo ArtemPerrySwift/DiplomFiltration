@@ -45,20 +45,22 @@ int main()
 	fem.init(calculationArea);
 	outPress.open("Pressure.txt");
 	outPress << "Time " << 0.0 << std::endl;
+	fem.getSolutWeights(q);
 	fem.printSolution(outPress);
 	outPress.close();
 	outPress << std::endl;
-	fem.getSolutWeights(q);
+	
 	Output2D(0, q, calculationArea, 0);
 	//return 0;
+	std::cout << setprecision(15) << endl;
 	Coord p(2, 0.0, 0.5);
-	//std::cout << "r               Solution " << std::endl;
-	//for (double x = 2.0; x < 499.0; x += 10)
-	///{
-	//	p.x = x;
-		//std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
-	//}
-	//std::cout << endl;
+	std::cout << "r               Solution " << std::endl;
+	for (double x = 2.0; x < 499.0; x += 10)
+	{
+		p.x = x;
+		std::cout << p.x << " " << p.y << " " << p.z << " " << fem.countSolution(p) /* << " " << DifferentEquParams::u1(p.x, p.y, p.z) << " " << fem.countSolution(p) - DifferentEquParams::u1(p.x, p.y, p.z)*/ << std::endl;
+	}
+	std::cout << endl;
 	
 	flowCulcer.init(calculationArea, q);
 	flowCulcer.calcFlows();

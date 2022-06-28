@@ -38,8 +38,10 @@ class FaceBasic2Cond: public FaceBasic, public GausseIntegr2D
 	int iPhi2d, jPhi2D;
 	int buildLocalM2D();
 	void fillLocalEtta();
+	int functNum;
 public:
 	void calcAddLocalB(double localAddB[N_BASIC]);
+	void init(Face face, CoordStorage coordStorage, int FunctNum);
 };
 
 class FaceBasicFlow: public FaceBasic

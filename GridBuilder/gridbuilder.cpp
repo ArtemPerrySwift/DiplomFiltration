@@ -666,9 +666,12 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 
 
 	knots1Cond.IKnots = new int[n];
+	knots1Cond.functNums = new int[n];
 	knots1Cond.kt1 = n;
 	int iknot = 0;
 	int* Iknots = knots1Cond.IKnots;
+	int* functNums = knots1Cond.functNums;
+	int functNum;
 	for (i = 0; i < nFirstCond; i++)
 	{
 		i_x1 = IX_w[borderFirstCondAr[i].horizL];
@@ -683,7 +686,7 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 		i_x2++;
 		j_y2++;
 		k_z2++;
-
+		functNum = borderFirstCondAr[i].fun_num;
 		for (k_z = k_z1; k_z < k_z2; k_z++)
 		{
 			for (j_y = j_y1; j_y < j_y2; j_y++)
@@ -692,6 +695,7 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 				{
 					ind = XYZ.getKnotIndex(i_x, j_y, k_z);
 					Iknots[iknot] = ind;
+					functNums[iknot] = functNum;
 				}
 			}
 		}
@@ -708,11 +712,13 @@ bool CalculationArea::fill1CondKnots(CrushedMeshCoordStorage XYZ, ContainerBorde
 		sirfEnd = wellBuf.nSirfs;
 		jCircle = wellBuf.nCircle - 1;
 		int iCoord, kSirf;
+		functNum = borderStorageWell.functNums[i];
 		for (kSirf = sirfBeg; kSirf < sirfEnd; kSirf++)
 		{
 			for (iCoord = coordBeg; iCoord < coordEnd; iCoord++, iknot++)
 			{
 				Iknots[iknot] = wellBuf.globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
+				functNums[iknot] = functNum;
 			}
 		}
 
@@ -775,10 +781,12 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 
 	Faces2CondStore.faces = new Face[n];
 	Faces2CondStore.count = n;
+	faces2CondStore.functNums = new int[n];
 	Face* cond2Faces = Faces2CondStore.faces;
 	int iFace = 0;
 	int* localIKnots;
-
+	int* functNums = faces2CondStore.functNums;
+	int functNum;
 	for (i = 0; i < nSecondCond; i++)
 	{
 		horL = IX_w[borderSecondCondAr[i].horizL];
@@ -789,7 +797,7 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 
 		heiL = IZ_w[borderSecondCondAr[i].heightL];
 		heiR = IZ_w[borderSecondCondAr[i].heightR];
-
+		functNum = borderSecondCondAr[i].fun_num;
 		if (horL == horR)
 		{
 			//horR++;
@@ -801,6 +809,7 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 			{
 				for (jVer = verL; jVer < verR; jVer++, iFace++)
 				{
+					functNums[iFace] = functNum;
 					localIKnots = cond2Faces[iFace].knots;
 					localIKnots[0] = XYZ.getKnotIndex(iHor, jVer, kHei);
 					localIKnots[1] = XYZ.getKnotIndex(iHor, jVer + 1, kHei);
@@ -822,6 +831,7 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 			{
 				for (iHor = horL; iHor < horR; iHor++, iFace++)
 				{
+					functNums[iFace] = functNum;
 					localIKnots = cond2Faces[iFace].knots;
 					localIKnots[0] = XYZ.getKnotIndex(iHor, jVer, kHei);
 					localIKnots[1] = XYZ.getKnotIndex(iHor + 1, jVer, kHei);
@@ -842,6 +852,7 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 			{
 				for (iHor = horL; iHor < horR; iHor++, iFace++)
 				{
+					functNums[iFace] = functNum;
 					localIKnots = cond2Faces[iFace].knots;
 					localIKnots[0] = XYZ.getKnotIndex(iHor, jVer, kHei);
 					localIKnots[1] = XYZ.getKnotIndex(iHor + 1, jVer, kHei);
@@ -866,17 +877,20 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 		jCircle = wellBuf.nCircle - 1;
 		int iCoord, kSirf;
 		globI = wellBuf.globI;
+		functNum = borderStorageWell.functNums[i];
 		for (kSirf = sirfBeg; kSirf < sirfEnd; kSirf++)
 		{
 			for (iCoord = coordBeg; iCoord < coordEnd; iCoord++, iFace++)
 			{
 				localIKnots = cond2Faces[iFace].knots;
+				functNums[iFace] = functNum;
 				localIKnots[0] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
 				localIKnots[1] = globI[wellBuf.getKnotIndex(iCoord + 1, jCircle, kSirf)];
 				localIKnots[2] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf + 1)];
 				localIKnots[3] = globI[wellBuf.getKnotIndex(iCoord + 1, jCircle, kSirf + 1)];
 			}
 
+			functNums[iFace] = functNum;
 			localIKnots = cond2Faces[iFace].knots;
 			localIKnots[0] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
 			localIKnots[1] = globI[wellBuf.getKnotIndex(coordBeg, jCircle, kSirf)];
@@ -889,9 +903,13 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 
 	faces2CondStore.nFaces = n;
 	faces2CondStore.iFaces = new int[n];
+	//faces2CondStore.functNums = new int[n];
 	int* iFaces = faces2CondStore.iFaces;
+	
 	for (i = 0; i < n; i++)
 		iFaces[i] = faceStore.findFaceIndex(cond2Faces[i]);
+	
+		
 
 	return 0;
 }
@@ -2421,6 +2439,7 @@ void FinitElementStore::write(std::ofstream &out)
 bool BorderStorageWell::allocateMemory()
 {
 	iWells = new int[count];
+	functNums = new int[count];
 	nWells = count;
 	return true;
 }
@@ -2428,6 +2447,7 @@ bool BorderStorageWell::allocateMemory()
 bool BorderStorageWell::readData(std::ifstream& in, int i)
 {
 	in >> iWells[i];
+	in >> functNums[i];
 	return true;
 }
 

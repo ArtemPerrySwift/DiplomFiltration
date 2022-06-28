@@ -5,19 +5,19 @@ double DifferentEquParams::f(double x, double y, double z)
 	return 0;
 }
 
-double DifferentEquParams::u1(double x, double y, double z)
+double DifferentEquParams::u1(double x, double y, double z, int functNum)
 {
 	//if (x * x + y * y < 16)
 		//return 200 * log(sqrt(x * x + y * y)) - 1142.92162;
 	//return 100;
-	return y < 0 ? 100 : 130;
-	//return 100;
+	//return y < 0 ? 100 : 130;
+	return x;
 }
 
-double DifferentEquParams::du_dn(double x, double y, double z)
+double DifferentEquParams::du_dn(double x, double y, double z, int functNum)
 {
-	//return -1;
-	return -100;
+	return -1;
+	//return -100;
 }
 
 double DifferentEquParams::lambda(double K, Phase* phases, int nPhases)

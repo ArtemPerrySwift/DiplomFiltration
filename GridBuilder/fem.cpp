@@ -27,7 +27,7 @@ void FEM::init(CalculationArea& calculationArea)
 	arrayspace::fill_vec(q, A.n, 0.0);
 	nBufLookingArea = 10;
 	nBufLookingCenter = 0;
-	LinearTask();
+	//LinearTask();
 	
 }
 
@@ -35,6 +35,7 @@ void FEM::addFirstConditions()
 {
 	std::cout << "Учёт первых краевых условий" << std::endl;
 	int* Iknots = calculationArea.knots1Cond.IKnots;
+	int* functNums = calculationArea.knots1Cond.functNums;
 	int kt1 = calculationArea.knots1Cond.kt1;
 
 	Coord* knots = calculationArea.coordsStore.coords;
@@ -44,7 +45,7 @@ void FEM::addFirstConditions()
 	for (int i = 0; i < kt1; i++)
 	{
 		ind = Iknots[i];
-		uMean = DifferentEquParams::u1(knots[ind].x, knots[ind].y, knots[ind].z);
+		uMean = DifferentEquParams::u1(knots[ind].x, knots[ind].y, knots[ind].z, functNums[i]);
 		slae.setOneVariableSolve(ind, uMean);
 	}
 }
@@ -55,6 +56,7 @@ void FEM::addSecondConditions()
 	Face* faces = calculationArea.faceStore.faces;
 	int n = calculationArea.faces2CondStore.nFaces;
 	int* iFaces = calculationArea.faces2CondStore.iFaces;
+	int* functNums = calculationArea.faces2CondStore.functNums;
 	int n_basic = FaceBasic2Cond::N_BASIC;
 	FaceBasic2Cond faceBasic2Cond;
 	double LocalB[FaceBasic2Cond::N_BASIC];
@@ -65,9 +67,9 @@ void FEM::addSecondConditions()
 	double* b = slae.b;
 	for (i = 0; i < n; i++)
 	{
-		faceBasic2Cond.init(faces[iFaces[i]], calculationArea.coordsStore);
+		faceBasic2Cond.init(faces[iFaces[i]], calculationArea.coordsStore, functNums[i]);
 		faceBasic2Cond.calcAddLocalB(LocalB);
-		iFaceCoord = faces[i].knots;
+		iFaceCoord = faces[iFaces[i]].knots;
 		for (j = 0; j < n_basic; j++)
 		{
 			b[iFaceCoord[j]] += LocalB[j];
@@ -158,6 +160,7 @@ void FEM::LinearTask()
 	//slae.A.printFullMatrix();
 	//los_prec.solve(slae.A, slae.b, q, 100000, 1e-14);
 	int nCoord = calculationArea.coordsStore.count;
+	/*
 	double* bNew = new double[nCoord];
 	double* ansAn = new double[nCoord];
 	Coord p;
@@ -172,6 +175,7 @@ void FEM::LinearTask()
 	}
 	std::cout << "sum = " << sum << " " << sumx << std::endl;
 	slae.A.mult(ansAn, bNew);
+	*/
 	//for (int i = 1600; i < 1700; i++)
 	//{
 	//	std::cout << slae.b[i] << " " << bNew[i] << " " << slae.b[i] - bNew[i] << std::endl;

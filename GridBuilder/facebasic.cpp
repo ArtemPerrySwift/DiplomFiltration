@@ -106,6 +106,14 @@ void FaceBasic::init(Coord coords[N_BASIC])
 		coordFace[i] = coords[i];
 }
 
+void FaceBasic2Cond::init(Face face, CoordStorage coordStorage, int functNum)
+{
+	int* iKnots = face.knots;
+	Coord* coords = coordStorage.coords;
+	for (int i = 0; i < N_BASIC; i++)
+		coordFace[i] = coords[iKnots[i]];
+	this->functNum = functNum;
+}
 
 int FaceBasic2Cond::buildLocalM2D()
 {
@@ -127,7 +135,7 @@ int FaceBasic2Cond::buildLocalM2D()
 void FaceBasic2Cond::fillLocalEtta()
 {
 	for (int i = 0; i < N_BASIC; i++)
-		LocalEtta[i] = DifferentEquParams::du_dn(coordFace[i].x, coordFace[i].y, coordFace[i].z);
+		LocalEtta[i] = DifferentEquParams::du_dn(coordFace[i].x, coordFace[i].y, coordFace[i].z, functNum);
 }
 
 void FaceBasic2Cond::calcAddLocalB(double localAddB[N_BASIC])

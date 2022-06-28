@@ -45,6 +45,7 @@ private:
 	void calcBorderVol(BorderFacesPhases borderFacesStore, double dt);
 	void calcGenSat();
 	void calcGenPoreVol();
+	void calcGenVol();
 public:
 	void init(CalculationArea calculationArea, double dtMax);
 	void printSat(std::ofstream &out);

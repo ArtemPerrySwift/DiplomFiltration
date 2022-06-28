@@ -306,21 +306,27 @@ struct BorderFacesPhases :BorderFacesStore
 
 struct FaceStore
 {
+public:
 	Face* faces;
 	int count;
+
 	FaceStore();
+
 	bool init(FinitElementStore& finitElementStore, int nCoord);
 	bool createFaceStore(FinitElementStore& finitElementStore);
 	bool createFaceStore(FinitElementStore& finitElementStore, BorderFacesStore& borderFacesStore);
 	int findNeighboringFinitElem(int iFinElem, FinitElement& finitElement, int iLocalFace);
+	int findNumFaceFinitElem(Face face, int& iElem1, int& iElem2);
 	void copyStore(FaceStore& facesStore, int nFaces);
 	int findFaceIndex(const Face& face);
-	int* ig;
+	const int* getIg();
 private:
 	int nBufLookingCenter;
 	int nBufLookingArea;	
 	int* jg;
 	int n;
+	int* ig;
+
 };
 
 struct FlowStore
@@ -458,6 +464,48 @@ struct KnotsWithFirstConditionStorage
 	int kt1;
 };
 
+struct WellBordFacesInds
+{
+	int* IFaces;
+	int nFaces;
+};
+
+struct WellIFacesContainer
+{
+	WellBordFacesInds* wellBordFacesInds;
+	int nWells;
+};
+
+struct GenVol
+{
+	double volIn;
+	double volOut;
+	GenVol();
+	void reset();
+};
+
+struct GenVolContainer
+{
+	GenVol genVolMix;
+	GenVol* genVolPhases;
+	unsigned int nPhases;
+	GenVolContainer();
+	GenVolContainer(unsigned int nPhases);
+	void init(unsigned int nPhases);
+	void reset();
+};
+
+struct WellGenVolStore
+{
+	GenVolContainer* genVolContainer;
+	unsigned int nWells;
+
+	WellGenVolStore();
+	WellGenVolStore(unsigned int nWells, unsigned int nPhases);
+
+	void init(unsigned int nWells, unsigned int nPhases);
+	void reset();
+};
 struct CalculationArea // пространственная сетка
 {
 	//StoreMeshKnots XYZW;
@@ -475,8 +523,10 @@ struct CalculationArea // пространственная сетка
 	ContainerPhaseVol containerPhaseVol; // Объёмы перетекающих фаз
 	FaceStore faceStore; // Грани
 	BorderFacesStore faces2CondStore;
-
+	WellIFacesContainer wellIFacesContainer;
 	BorderFacesPhases borderFacesStore; // Грани на границе расчётной области
+	WellGenVolStore wellGenVolStore;
+
 	double endT; // Время до которого производиться расчёт
 	int nPhases;
 
@@ -487,4 +537,5 @@ private:
 	bool fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorders borders, WellStorage wellStorage);
 	bool fillGeneralFinElems(CrushedMeshCoordStorage XYZ, WellStorage wellStorage, AreaStorage areas);
 	bool fillGeneralCoords(CoordStorage XYZ, WellStorage wellStorage);
+	bool fillWellBordFacesInds(WellStorage wellStorage);
 };

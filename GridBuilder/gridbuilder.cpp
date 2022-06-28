@@ -620,6 +620,8 @@ CalculationArea::CalculationArea(std::string fileNameCord, std::string fileNameS
 	std::cout << "Выделение памяти под объёмы фаз" << std::endl;
 	containerPhaseVol.init(faceStore, areas.nPhases);
 
+	wellGenVolStore.init(wellStorage.count, nPhases);
+	fillWellBordFacesInds(wellStorage);
 	/*Генерация сетки*/
 }
 
@@ -912,6 +914,63 @@ bool CalculationArea::fillCondFaces(CrushedMeshCoordStorage XYZ, ContainerBorder
 		
 
 	return 0;
+}
+
+bool CalculationArea::fillWellBordFacesInds(WellStorage wellStorage)
+{
+	int nWells = wellStorage.count;
+	Well wellBuf;
+	
+	int i;
+	wellIFacesContainer.wellBordFacesInds = new WellBordFacesInds[nWells];
+	wellIFacesContainer.nWells = nWells;
+
+	for (i = 0; i < nWells; i++)
+	{
+		wellIFacesContainer.wellBordFacesInds[i].nFaces = wellStorage.wells[i].getNumWellFaces();
+		wellIFacesContainer.wellBordFacesInds[i].IFaces = new int[wellIFacesContainer.wellBordFacesInds[i].nFaces];
+	}
+
+	int iCoord, jCircle, kSirf;
+	int coordBeg = 0, coordEnd;
+	int sirfBeg = 0, sirfEnd;
+	int* globI;
+	int iFace;
+	Face faceBuf;
+	int* localIKnots = faceBuf.knots;
+	int* WellIFaces;
+	for (i = 0; i < nWells; i++)
+	{
+		wellBuf = wellStorage.wells[i];
+		coordEnd = wellBuf.nCircleCoords - 1;
+		sirfEnd = wellBuf.nSirfs - 1;
+		jCircle = wellBuf.nCircle - 1;
+		int iCoord, kSirf;
+		globI = wellBuf.globI;
+		iFace = 0;
+		WellIFaces = wellIFacesContainer.wellBordFacesInds[i].IFaces;
+		for (kSirf = sirfBeg; kSirf < sirfEnd; kSirf++)
+		{
+			for (iCoord = coordBeg; iCoord < coordEnd; iCoord++, iFace++)
+			{
+				localIKnots[0] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
+				localIKnots[1] = globI[wellBuf.getKnotIndex(iCoord + 1, jCircle, kSirf)];
+				localIKnots[2] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf + 1)];
+				localIKnots[3] = globI[wellBuf.getKnotIndex(iCoord + 1, jCircle, kSirf + 1)];
+				WellIFaces[iFace] = faceStore.findFaceIndex(faceBuf);
+			}
+
+			localIKnots[0] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf)];
+			localIKnots[1] = globI[wellBuf.getKnotIndex(coordBeg, jCircle, kSirf)];
+			localIKnots[2] = globI[wellBuf.getKnotIndex(iCoord, jCircle, kSirf + 1)];
+			localIKnots[3] = globI[wellBuf.getKnotIndex(coordBeg, jCircle, kSirf + 1)];
+			WellIFaces[iFace] = faceStore.findFaceIndex(faceBuf);
+			iFace++;
+		}
+
+	}
+
+	return true;
 }
 
 bool CalculationArea::fillGeneralFinElems(CrushedMeshCoordStorage XYZ, WellStorage wellStorage, AreaStorage areas)
@@ -1618,7 +1677,48 @@ int FaceStore::findNeighboringFinitElem(int indFinElem, FinitElement& finitEleme
 	return ifinElem;
 }
 
+int FaceStore::findNumFaceFinitElem(Face face, int& iElem1, int& iElem2)
+{
+	int* faceVer = face.knots;
 
+	int ver0 = faceVer[0];
+	int finElemsWithVer1 = ig[ver0 + 1] - ig[ver0];
+	int ver0Beg = ig[ver0], ver0End = ig[ver0 + 1];
+	int i, j;
+	int ifinElem;
+	int enoghVerNumFace = 3;
+	unsigned char nFoundElem = 0;
+	bool fl = false;
+	iElem1 = iElem2 = -1;
+
+	for (i = ver0Beg; i < ver0End && nFoundElem < 2; i++)
+	{
+		ifinElem = jg[i];
+		//if (ifinElem == indFinElem) continue;
+		fl = true;
+		for (j = 1; j < enoghVerNumFace && fl; j++)
+		{
+			int verj = faceVer[j];
+			fl = arrayspace::serchInSorted(jg, ig[verj], ig[verj + 1] - ig[verj], ifinElem) > -1;
+		}
+		
+		if (fl)
+		{
+			nFoundElem++;
+			if (nFoundElem == 1) iElem1 = ifinElem;
+			else iElem2 = ifinElem;
+		}
+	}
+
+	if (!fl) return -1;
+
+	return ifinElem;
+}
+
+const int* FaceStore::getIg()
+{
+	return ig;
+}
 //---------------FinitElement-------------//
 
 bool FinitElement::getFaceGlobalNum(int iLocalFace, int faceVer[VER_NUM_FACE])
@@ -2461,4 +2561,74 @@ void BorderFacesStore::copyBorderFacesStore(BorderFacesStore borderFacesStore, i
 	this->nFaces = nFaces;
 	for (int i = 0; i < nFaces; i++)
 		iFaces[i] = iFaceOther[i];
+}
+
+GenVol::GenVol(){reset();}
+
+void GenVol::reset()
+{
+	volIn = 0;
+	volOut = 0;
+}
+
+GenVolContainer::GenVolContainer()
+{
+	nPhases = 0;
+	genVolPhases = NULL;
+}
+
+GenVolContainer::GenVolContainer(unsigned int nPhases)
+{
+	genVolPhases = nPhases == 0 ? NULL : new GenVol[nPhases];
+	this->nPhases = nPhases;
+}
+
+void GenVolContainer::reset()
+{
+	genVolMix.reset();
+	for (int i = 0; i < nPhases; i++)
+		genVolPhases[i].reset();
+}
+
+void GenVolContainer::init(unsigned int nPhases)
+{
+	if (this->nPhases != nPhases)
+	{
+		if(genVolPhases != NULL) delete[] genVolPhases;
+		genVolPhases = nPhases == 0 ? NULL : new GenVol[nPhases];
+		this->nPhases = nPhases;
+	}
+}
+
+WellGenVolStore::WellGenVolStore()
+{
+	genVolContainer = NULL;
+	nWells = 0;
+}
+
+WellGenVolStore::WellGenVolStore(unsigned int nWells, unsigned int nPhases)
+{
+	genVolContainer = nWells == 0 ? NULL : new GenVolContainer[nWells];
+	this->nWells = nWells;
+	for (int i = 0; i < nWells; i++)
+		genVolContainer[i].init(nPhases);
+}
+
+void WellGenVolStore::init(unsigned int nWells, unsigned int nPhases)
+{
+	if (this->nWells != nWells)
+	{
+		if (genVolContainer != NULL) delete[] genVolContainer;
+		genVolContainer = nWells == 0 ? NULL : new GenVolContainer[nWells];
+		this->nWells = nWells;
+		for (int i = 0; i < nWells; i++)
+			genVolContainer[i].init(nPhases);
+	}
+}
+
+void WellGenVolStore::reset()
+{
+	for (int i = 0; i < nWells; i++)
+		genVolContainer[i].reset();
+	
 }

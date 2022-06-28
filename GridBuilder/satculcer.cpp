@@ -1,6 +1,7 @@
 #include "satculcer.h"
 #include "DifferentEquParams.h"
 #include <iomanip>
+#include "programlog.h"
 
 const double SatCulcer::S_MIN = 0.01;
 const double SatCulcer::S_MAX = 0.05;
@@ -373,6 +374,7 @@ double SatCulcer::reculcSat()
 	pushOutPhases();
 	calcNewSat();
 	calcGenSat();
+	calcGenVol();
 	return dt;
 }
 
@@ -462,5 +464,58 @@ bool operator <(const PhaseOut& left, const PhaseOut& right)
 	return left.iFinElem < right.iFinElem;
 }
 
+void SatCulcer::calcGenVol()
+{
+	int iPhase, iWell, iLocFace, iFace;
+	int nWell = calculationArea.wellGenVolStore.nWells;
+	int nPhases = calculationArea.nPhases;
+	GenVolContainer* wellsGenVolContainers = calculationArea.wellGenVolStore.genVolContainer;
+	WellBordFacesInds* wellBordFacesInds = calculationArea.wellIFacesContainer.wellBordFacesInds;
+	FinitElement* finitElements = calculationArea.finitElementStore.finitElements;
+	PhaseVolStore* phaseVolStore = calculationArea.containerPhaseVol.phaseVolStore;
+	PhaseVolStore phaseVolStoreMix = calculationArea.containerPhaseVol.phaseVolStoreMix;
+	int* wellBordIFaces;
+	int nIFaces;
+	GenVol* genVolPhases;
+	Face faceBuf;
+	int iElem1, iElem2;
+	int locFace;
+	signed char sign = 0;
+	calculationArea.wellGenVolStore.reset();
+	for (iWell = 0; iWell < nWell; iWell++)
+	{
+		wellBordIFaces = wellBordFacesInds[iWell].IFaces;
+		nIFaces = wellBordFacesInds[iWell].nFaces;
+		genVolPhases = wellsGenVolContainers[iWell].genVolPhases;
+		for (iLocFace = 0; iLocFace < nIFaces; iLocFace++)
+		{
+			iFace = wellBordIFaces[iLocFace];
+			faceBuf = calculationArea.faceStore.faces[iFace];
 
+			calculationArea.faceStore.findNumFaceFinitElem(faceBuf, iElem1, iElem2);
+			if (iElem1 == -1)
+				programlog::writeErr("Wrong calc of iElem1");
+			else
+			{
+				for (locFace = 0; locFace < FACES_NUM; locFace++)
+				{
+					if (iFace == finitElements[iElem1].faces[locFace])
+						sign = finitElements[iElem1].flowSign[locFace];
+				}
+				if (sign > 0)
+					wellsGenVolContainers[iWell].genVolMix.volOut += phaseVolStoreMix.PhaseVol[iFace];
+				else
+					wellsGenVolContainers[iWell].genVolMix.volIn += phaseVolStoreMix.PhaseVol[iFace];
+
+				for (iPhase = 0; iPhase < nPhases; iPhase++)
+				{
+					if (sign > 0)
+						wellsGenVolContainers[iWell].genVolPhases[iPhase].volOut += phaseVolStoreMix.PhaseVol[iFace];
+					else
+						wellsGenVolContainers[iWell].genVolPhases[iPhase].volIn += phaseVolStoreMix.PhaseVol[iFace];
+				}
+			}
+		}
+	}
+}
 

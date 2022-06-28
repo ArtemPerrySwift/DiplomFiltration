@@ -224,7 +224,7 @@ void Output2D(int it, double* q, CalculationArea calculationArea, double t)
 	FinitElement* finitElems = calculationArea.finitElementStore.finitElements;
 	Coord* coords = calculationArea.coordsStore.coords;
 	int i, j;
-	int* nKnotElems = calculationArea.faceStore.ig;
+	const int* nKnotElems = calculationArea.faceStore.getIg();/*calculationArea.faceStore.ig*/;
 	double* qPhase1 = new double[kuslov];
 	double* qPhase2 = new double[kuslov];
 	std::string pathInput = "output2D_temperature";
